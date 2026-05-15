@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: Sistema Digital El Dorado API
+  version: 1.0.0
+  description: API REST para gestion de pasajes, abordaje, biometria y GPS de Terminal El Dorado.
+servers:
+  - url: http://localhost/api
+    description: Desarrollo Docker
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+  - name: Pasajeros
+  - name: Viajes
+  - name: Boletos
+  - name: Abordaje
+  - name: GPS
+  - name: Autoridad
+  - name: Reportes
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Inicia sesion y retorna JWT u OTP si requiere 2FA.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email, example: admin@eldorado.bo }
+                password: { type: string, example: Eldorado2026! }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+        "401": { $ref: "#/components/responses/Error" }
+  /auth/verify-2fa:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Verifica OTP de administrador o supervisor.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, token_2fa]
+              properties:
+                email: { type: string, format: email }
+                token_2fa: { type: string, minLength: 6, maxLength: 6 }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Retorna usuario autenticado.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /pasajeros:
+    get:
+      tags: [Pasajeros]
+      summary: Lista pasajeros con filtros ci, nombre y es_menor.
+      parameters:
+        - in: query
+          name: ci
+          schema: { type: string }
+        - in: query
+          name: nombre
+          schema: { type: string }
+        - in: query
+          name: es_menor
+          schema: { type: boolean }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    post:
+      tags: [Pasajeros]
+      summary: Registra pasajero.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PasajeroInput" }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /pasajeros/buscar:
+    get:
+      tags: [Pasajeros]
+      summary: Busca pasajero por CI.
+      parameters:
+        - in: query
+          name: ci
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /pasajeros/{id}/huella:
+    post:
+      tags: [Pasajeros]
+      summary: Registra huella dactilar cifrada.
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [plantilla, dedo, calidad]
+              properties:
+                plantilla: { type: string }
+                dedo: { type: string, enum: [pulgar_der, indice_der, medio_der, pulgar_izq, indice_izq] }
+                calidad: { type: integer, minimum: 0, maximum: 100 }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /pasajeros/{id}/menor/vincular:
+    post:
+      tags: [Pasajeros]
+      summary: Vincula menor con adulto responsable.
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [adulto_responsable_id, tipo_relacion]
+              properties:
+                adulto_responsable_id: { type: integer }
+                tipo_relacion: { type: string, enum: [padre, madre, tutor_legal, acompanante_autorizado] }
+                numero_permiso_dna: { type: string }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /rutas:
+    get:
+      tags: [Viajes]
+      summary: Lista rutas activas.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    post:
+      tags: [Viajes]
+      summary: Crea ruta.
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /buses:
+    get:
+      tags: [Viajes]
+      summary: Lista buses activos.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    post:
+      tags: [Viajes]
+      summary: Registra bus.
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /viajes:
+    get:
+      tags: [Viajes]
+      summary: Lista viajes por fecha, ruta o estado.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    post:
+      tags: [Viajes]
+      summary: Crea viaje y genera asientos.
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /viajes/{id}/asientos:
+    get:
+      tags: [Viajes]
+      summary: Devuelve croquis con estado de asientos.
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /viajes/{id}/manifiesto:
+    get:
+      tags: [Viajes]
+      summary: Manifiesto completo del viaje.
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /asientos/bloquear:
+    post:
+      tags: [Boletos]
+      summary: Bloquea asiento por 10 minutos.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+        "409": { $ref: "#/components/responses/Error" }
+  /boletos:
+    post:
+      tags: [Boletos]
+      summary: Emite boleto y genera QR firmado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [viaje_id, asiento_id, pasajero_id, metodo_pago]
+              properties:
+                viaje_id: { type: integer }
+                asiento_id: { type: integer }
+                pasajero_id: { type: integer }
+                adulto_resp_id: { type: integer, nullable: true }
+                metodo_pago: { type: string, enum: [efectivo, qr_bancario, tarjeta] }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+        "409": { $ref: "#/components/responses/Error" }
+  /boletos/{id}/cancelar:
+    put:
+      tags: [Boletos]
+      summary: Cancela boleto y libera asiento.
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /abordaje/validar-qr:
+    post:
+      tags: [Abordaje]
+      summary: Valida abordaje por QR o codigo de boleto.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+        "403": { $ref: "#/components/responses/Error" }
+  /abordaje/validar-huella:
+    post:
+      tags: [Abordaje]
+      summary: Valida abordaje por huella.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /gps/ubicacion:
+    post:
+      tags: [GPS]
+      summary: Recibe ubicacion GPS y emite evento Reverb.
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /gps/buses/activos:
+    get:
+      tags: [GPS]
+      summary: Posicion actual de buses activos.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /consulta/viaje/{codigo_qr}:
+    get:
+      tags: [Autoridad]
+      security: []
+      summary: Consulta publica de viaje por codigo o QR.
+      parameters:
+        - in: path
+          name: codigo_qr
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /reportes/ventas-diarias:
+    get:
+      tags: [Reportes]
+      summary: Ventas del dia por vendedor.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /reportes/auditoria:
+    get:
+      tags: [Reportes]
+      summary: Log de auditoria paginado.
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema: { type: integer }
+  responses:
+    Success:
+      description: Respuesta estandar exitosa.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiResponse"
+    Error:
+      description: Respuesta estandar de error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { nullable: true }
+        message: { type: string }
+        errors: { nullable: true }
+    ApiError:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        data: { nullable: true }
+        message: { type: string }
+        errors:
+          type: object
+          additionalProperties: true
+        code: { type: string, example: ASIENTO_NO_DISPONIBLE }
+    PasajeroInput:
+      type: object
+      required: [nombres, apellidos, numero_ci, expedido_en, fecha_nacimiento]
+      properties:
+        nombres: { type: string, example: Carlos Alberto }
+        apellidos: { type: string, example: Cabezas Ramirez }
+        numero_ci: { type: string, example: "1234567" }
+        complemento_ci: { type: string, nullable: true }
+        expedido_en: { type: string, example: CB }
+        fecha_nacimiento: { type: string, format: date }
+        telefono: { type: string, nullable: true }
+        email: { type: string, format: email, nullable: true }

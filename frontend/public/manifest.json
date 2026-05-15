@@ -1,0 +1,10 @@
+{
+  "name": "Sistema Digital El Dorado",
+  "short_name": "ElDorado",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f766e",
+  "description": "Sistema de gestion de pasajes, abordaje y monitoreo GPS para Terminal El Dorado",
+  "icons": []
+}

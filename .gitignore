@@ -1,0 +1,36 @@
+# Laravel
+/vendor/
+backend/vendor/
+/node_modules/
+/public/storage
+/storage/*.key
+.env
+backend/.env
+.phpunit.result.cache
+backend/.phpunit.result.cache
+backend/storage/logs/*.log
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*.php
+backend/bootstrap/cache/*.php
+Homestead.json
+Homestead.yaml
+npm-debug.log
+.DS_Store
+.idea/
+.vscode/
+
+# MySQL/Redis volumes
+mysql_data/
+redis_data/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.pwa/
+frontend/coverage/
+
+# Docker
+*.pid
+*.sock
