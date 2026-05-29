@@ -12,7 +12,17 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isAuthenticated: (state) => Boolean(state.token),
     role: (state) => state.user?.rol || null,
-    displayName: (state) => state.user?.nombre || 'Operador'
+    nombre: (state) => state.user?.nombre || 'Operador',
+    displayName: (state) => state.user?.nombre || 'Operador',
+    roleLabel: (state) => {
+      const labels = {
+        administrador: 'Administrador',
+        supervisor: 'Supervisor',
+        vendedor: 'Vendedor',
+        auxiliar: 'Auxiliar'
+      };
+      return labels[state.user?.rol] || state.user?.rol || 'Usuario';
+    }
   },
   actions: {
     async login(credentials) {
