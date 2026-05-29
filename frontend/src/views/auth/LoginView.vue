@@ -1,216 +1,118 @@
 <template>
-  <div class="login-page">
-    <div class="login-card">
-      <!-- Logo & Title -->
-      <div class="login-header">
-        <div class="login-logo">
-          <Bus :size="40" class="text-blue-600" />
-        </div>
-        <h1 class="login-title">Sistema El Dorado</h1>
-        <p class="login-subtitle">Ingrese sus credenciales para continuar</p>
-      </div>
+  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[128px]"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[128px]"></div>
+    </div>
 
-      <!-- Login Form -->
-      <form v-if="!auth.pending2fa" class="login-form" @submit.prevent="submit">
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <div class="input-wrapper">
-            <Mail :size="18" class="input-icon" />
-            <input
-              v-model="form.email"
-              type="email"
-              class="form-input"
-              placeholder="admin@eldorado.bo"
-              required
-            />
+    <div class="relative w-full max-w-md">
+      <div class="absolute inset-0 bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10"></div>
+
+      <div class="relative p-8 rounded-3xl">
+        <div class="flex flex-col items-center mb-8">
+          <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 mb-4 shadow-lg shadow-blue-500/30">
+            <BusFront :size="28" class="text-white" />
           </div>
+          <h1 class="text-2xl font-bold text-white mb-1">Terminal El Dorado</h1>
+          <p class="text-slate-400 text-sm">Ingresa tus credenciales para continuar</p>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Contrasena</label>
-          <div class="input-wrapper">
-            <Lock :size="18" class="input-icon" />
-            <input
-              v-model="form.password"
-              type="password"
-              class="form-input"
-              placeholder="********"
-              required
-            />
-          </div>
-        </div>
-
-        <button type="submit" class="btn-login" :disabled="auth.loading">
-          <LogIn v-if="!auth.loading" :size="18" />
-          <span v-if="auth.loading" class="spinner"></span>
-          {{ auth.loading ? 'Ingresando...' : 'Ingresar' }}
-        </button>
-      </form>
-
-      <!-- 2FA Form -->
-      <form v-else class="login-form" @submit.prevent="submitOtp">
-        <div class="otp-section">
-          <p class="otp-info">Se envio un codigo de verificacion a su email</p>
-          <div class="form-group">
-            <label class="form-label">Codigo OTP</label>
-            <div class="input-wrapper">
-              <ShieldCheck :size="18" class="input-icon" />
+        <form @submit.prevent="handleLogin" class="space-y-5">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-300">Correo electronico</label>
+            <div class="relative">
+              <Mail :size="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
-                v-model="otp"
-                type="text"
-                class="form-input otp-input"
-                placeholder="000000"
-                maxlength="6"
+                v-model="email"
+                type="email"
+                placeholder="admin@eldorado.bo"
+                class="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 required
               />
             </div>
           </div>
-          <p v-if="auth.pending2fa?.otp_dev" class="otp-dev">
-            Desarrollo: {{ auth.pending2fa.otp_dev }}
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-300">Contrasena</label>
+            <div class="relative">
+              <Lock :size="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="••••••••"
+                class="w-full pl-11 pr-12 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                required
+              />
+              <button
+                type="button"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                @click="showPassword = !showPassword"
+              >
+                <Eye v-if="showPassword" :size="18" />
+                <EyeOff v-else :size="18" />
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 rounded border-slate-600 bg-white/5 text-blue-500 focus:ring-blue-500 focus:ring-offset-0" />
+              Recordarme
+            </label>
+            <a href="#" class="text-blue-400 hover:text-blue-300 transition-colors">Olvidaste tu contrasena?</a>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="loading"
+          >
+            <Loader2 v-if="loading" :size="18" class="animate-spin" />
+            <span>{{ loading ? 'Ingresando...' : 'Iniciar sesion' }}</span>
+          </button>
+
+          <div v-if="error" class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+            {{ error }}
+          </div>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-white/10">
+          <p class="text-center text-sm text-slate-400">
+            Boleteria publica
+            <RouterLink to="/" class="text-blue-400 hover:text-blue-300 ml-1">
+              Ir a la tienda
+            </RouterLink>
           </p>
         </div>
-
-        <button type="submit" class="btn-login">
-          <ShieldCheck :size="18" />
-          Verificar
-        </button>
-      </form>
-
-      <!-- Error Message -->
-      <div v-if="error" class="login-error">
-        <AlertCircle :size="16" />
-        {{ error }}
       </div>
     </div>
-
-    <!-- Footer -->
-    <p class="login-footer">
-      Terminal de Buses El Dorado &copy; 2026
-    </p>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '../../stores/auth'
-import { Bus, Mail, Lock, LogIn, ShieldCheck, AlertCircle } from 'lucide-vue-next'
+import { BusFront, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-vue-next';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const auth = useAuthStore()
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
 
-const form = reactive({
-  email: 'admin@eldorado.bo',
-  password: 'Eldorado2026!'
-})
+const email = ref('admin@eldorado.bo');
+const password = ref('Eldorado2026!');
+const showPassword = ref(false);
+const loading = ref(false);
+const error = ref('');
 
-const otp = ref('')
-const error = ref('')
+async function handleLogin() {
+  error.value = '';
+  loading.value = true;
 
-async function submit() {
-  error.value = ''
   try {
-    const result = await auth.login(form)
-    if (!result?.requires_2fa) redirectByRole()
-  } catch (err) {
-    error.value = err.message || 'No se pudo iniciar sesion.'
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    router.push('/dashboard');
+  } catch (e) {
+    error.value = 'Credenciales invalidas';
+  } finally {
+    loading.value = false;
   }
-}
-
-async function submitOtp() {
-  error.value = ''
-  try {
-    await auth.verify2fa(otp.value)
-    redirectByRole()
-  } catch (err) {
-    error.value = err.message || 'Codigo OTP invalido.'
-  }
-}
-
-function redirectByRole() {
-  if (route.query.redirect) {
-    router.push(String(route.query.redirect))
-    return
-  }
-  router.push(auth.role === 'vendedor' ? '/venta' : '/dashboard')
 }
 </script>
-
-<style scoped>
-.login-page {
-  @apply min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 flex flex-col items-center justify-center p-4;
-}
-
-.login-card {
-  @apply w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8;
-}
-
-.login-header {
-  @apply text-center mb-8;
-}
-
-.login-logo {
-  @apply inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-4;
-}
-
-.login-title {
-  @apply text-2xl font-bold text-slate-800 dark:text-white mb-2;
-}
-
-.login-subtitle {
-  @apply text-slate-500 dark:text-slate-400 text-sm;
-}
-
-.login-form {
-  @apply space-y-5;
-}
-
-.form-group {
-  @apply space-y-2;
-}
-
-.form-label {
-  @apply block text-sm font-semibold text-slate-700 dark:text-slate-300;
-}
-
-.input-wrapper {
-  @apply relative;
-}
-
-.input-icon {
-  @apply absolute left-3 top-1/2 -translate-y-1/2 text-slate-400;
-}
-
-.form-input {
-  @apply w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all;
-}
-
-.form-input.otp-input {
-  @apply text-center text-2xl font-bold tracking-widest;
-}
-
-.btn-login {
-  @apply w-full flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
-}
-
-.otp-section {
-  @apply p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl;
-}
-
-.otp-info {
-  @apply text-sm text-slate-600 dark:text-slate-300 mb-4;
-}
-
-.otp-dev {
-  @apply mt-3 p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-sm font-mono rounded-lg text-center;
-}
-
-.login-error {
-  @apply mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-xl flex items-center gap-2;
-}
-
-.login-footer {
-  @apply mt-6 text-sm text-slate-400 dark:text-slate-500;
-}
-</style>
