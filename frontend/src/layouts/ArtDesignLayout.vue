@@ -188,6 +188,7 @@
 <script setup>
 import {
   Bell,
+  Bus,
   BusFront,
   ChevronDown,
   ChevronRight,

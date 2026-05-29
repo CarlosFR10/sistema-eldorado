@@ -37,6 +37,8 @@ const routes = [
       { path: 'abordaje/validar', name: 'validar-qr', component: () => import('../views/abordaje/ValidarQrView.vue'), meta: { roles: ['auxiliar', 'supervisor', 'administrador'] } },
 
       { path: 'gps/monitoreo', name: 'gps-monitoreo', component: () => import('../views/gps/MonitoreoMapaView.vue'), meta: { roles: ['supervisor', 'administrador'] } },
+      { path: 'autoridad/consulta', name: 'autoridad-consulta', component: () => import('../views/autoridad/ConsultaViajeView.vue'), meta: { roles: ['supervisor', 'administrador'] } },
+      { path: 'perfil', name: 'perfil', component: () => import('../views/admin/DashboardView.vue'), meta: { roles: ['administrador', 'supervisor', 'vendedor', 'auxiliar'] } },
     ]
   }
 ];
