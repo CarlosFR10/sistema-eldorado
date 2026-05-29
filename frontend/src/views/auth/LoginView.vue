@@ -93,8 +93,10 @@
 import { BusFront, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../stores/auth';
 
 const router = useRouter();
+const auth = useAuthStore();
 
 const email = ref('admin@eldorado.bo');
 const password = ref('Eldorado2026!');
@@ -107,10 +109,18 @@ async function handleLogin() {
   loading.value = true;
 
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push('/dashboard');
+    const result = await auth.login({ email: email.value, password: password.value });
+    if (result?.requires_2fa) {
+      return;
+    }
+    const role = auth.role;
+    if (role === 'vendedor') {
+      router.push('/venta');
+    } else {
+      router.push('/dashboard');
+    }
   } catch (e) {
-    error.value = 'Credenciales invalidas';
+    error.value = e.response?.data?.message || 'Credenciales invalidas';
   } finally {
     loading.value = false;
   }
