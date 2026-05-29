@@ -1,112 +1,112 @@
 <template>
-  <section class="space-y-5">
+  <section class="space-y-6">
     <div>
-      <p class="text-sm font-black uppercase text-eldorado-teal">Venta en terminal</p>
-      <h1 class="text-2xl font-black text-slate-900">Emitir boleto</h1>
+      <p class="text-sm font-bold uppercase text-blue-600">Venta en terminal</p>
+      <h1 class="text-2xl font-bold text-slate-800">Emitir boleto</h1>
     </div>
 
-    <div class="grid gap-4 lg:grid-cols-[430px_1fr]">
+    <div class="grid gap-6 lg:grid-cols-[450px_1fr]">
       <aside class="space-y-4">
-        <section class="panel rounded-lg p-4">
-          <h2 class="mb-3 font-black text-slate-800">1. Viaje</h2>
-          <input v-model="filters.fecha" class="field mb-3" type="date" @change="cargarViajes" />
-          <select v-model="selectedViajeId" class="field" @change="seleccionarViaje">
+        <section class="card p-5">
+          <h2 class="mb-3 font-bold text-lg text-slate-800">1. Viaje</h2>
+          <input v-model="filters.fecha" class="form-input mb-3" type="date" @change="cargarViajes" />
+          <select v-model="selectedViajeId" class="form-input" @change="seleccionarViaje">
             <option :value="null">Seleccionar viaje</option>
             <option v-for="viaje in viajeStore.viajes" :key="viaje.id" :value="viaje.id">
               {{ viaje.codigo_viaje }} | {{ viaje.ruta?.origen }} - {{ viaje.ruta?.destino }} | {{ hora(viaje.fecha_salida) }} | Bs {{ viaje.precio_final }}
             </option>
           </select>
-          <div v-if="selectedViaje" class="mt-3 rounded-md bg-teal-50 border border-teal-200 p-3 text-sm">
-            <p class="font-black text-teal-900">{{ selectedViaje.codigo_viaje }}</p>
-            <p class="font-bold text-teal-800">{{ selectedViaje.ruta?.origen }} - {{ selectedViaje.ruta?.destino }} | Bus {{ selectedViaje.bus?.placa }}</p>
-            <p class="text-teal-700">{{ selectedViaje.bus?.tipo_bus }} - {{ selectedViaje.bus?.capacidad }} asientos</p>
+          <div v-if="selectedViaje" class="mt-3 rounded-xl bg-blue-50 border border-blue-200 p-3 text-sm">
+            <p class="font-bold text-blue-900">{{ selectedViaje.codigo_viaje }}</p>
+            <p class="text-blue-800">{{ selectedViaje.ruta?.origen }} - {{ selectedViaje.ruta?.destino }} | Bus {{ selectedViaje.bus?.placa }}</p>
+            <p class="text-blue-700">{{ selectedViaje.bus?.tipo_bus }} - {{ selectedViaje.bus?.capacidad }} asientos</p>
           </div>
         </section>
 
-        <section class="panel rounded-lg p-4">
+        <section class="card p-5">
           <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 class="font-black text-slate-800">2. Pasajeros</h2>
-            <span class="chip bg-teal-100 text-teal-900">{{ pasajerosListos }} de {{ cantidadPasajeros }} listos</span>
+            <h2 class="font-bold text-lg text-slate-800">2. Pasajeros</h2>
+            <span class="badge badge-blue">{{ pasajerosListos }} de {{ cantidadPasajeros }} listos</span>
           </div>
 
-          <label class="block space-y-1">
-            <span class="flex items-center gap-2 text-sm font-bold text-slate-600">
+          <label class="block space-y-1.5 mb-4">
+            <span class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <Users :size="16" />
               Cantidad de pasajeros
             </span>
-            <select v-model.number="cantidadPasajeros" class="field" @change="ajustarCantidad">
+            <select v-model.number="cantidadPasajeros" class="form-input" @change="ajustarCantidad">
               <option v-for="numero in 10" :key="numero" :value="numero">{{ numero }} pasajero{{ numero > 1 ? 's' : '' }}</option>
             </select>
           </label>
 
-          <div class="mt-4 grid gap-3">
+          <div class="space-y-3">
             <article
               v-for="(item, index) in pasajeros"
               :key="item.uid"
-              class="rounded-lg border p-3 transition"
-              :class="index === pasajeroActivoIndex ? 'border-teal-500 bg-teal-50 shadow-sm' : 'border-slate-200 bg-white'"
+              class="rounded-xl border p-4 transition"
+              :class="index === pasajeroActivoIndex ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-slate-200 bg-white'"
             >
               <div class="mb-2 flex items-center justify-between gap-2">
-                <button class="text-left font-black text-slate-900" type="button" @click="pasajeroActivoIndex = index">
+                <button class="text-left font-bold text-slate-800" type="button" @click="pasajeroActivoIndex = index">
                   Pasajero {{ index + 1 }}
                 </button>
-                <span v-if="item.asiento" class="chip bg-teal-100 text-teal-900">Asiento {{ item.asiento.numero }}</span>
+                <span v-if="item.asiento" class="badge badge-teal">Asiento {{ item.asiento.numero }}</span>
               </div>
 
               <div class="flex gap-2">
-                <input v-model.trim="item.ci" class="field" placeholder="CI del pasajero" @focus="pasajeroActivoIndex = index" @keyup.enter="buscarPasajeroVenta(index)" />
-                <button class="btn btn-secondary shrink-0" type="button" @click="buscarPasajeroVenta(index)">
+                <input v-model.trim="item.ci" class="form-input" placeholder="CI del pasajero" @focus="pasajeroActivoIndex = index" @keyup.enter="buscarPasajeroVenta(index)" />
+                <button class="btn-secondary" type="button" @click="buscarPasajeroVenta(index)">
                   <Search :size="18" />
                 </button>
               </div>
 
-              <div v-if="item.pasajero" class="mt-3 rounded-md bg-white p-3 text-sm">
-                <p class="font-black text-slate-900">{{ nombreCompleto(item.pasajero) }}</p>
+              <div v-if="item.pasajero" class="mt-3 rounded-xl bg-white p-3 text-sm border border-slate-100">
+                <p class="font-bold text-slate-900">{{ nombreCompleto(item.pasajero) }}</p>
                 <p class="text-slate-600">CI {{ item.pasajero.numero_ci }} {{ item.pasajero.expedido_en }} | {{ edad(item.pasajero.fecha_nacimiento) }} anos</p>
-                <p class="mt-2 flex items-center gap-2 font-bold" :class="item.pasajero.tiene_huella ? 'text-emerald-800' : 'text-amber-800'">
+                <p class="mt-2 flex items-center gap-2 font-semibold" :class="item.pasajero.tiene_huella ? 'text-green-700' : 'text-amber-700'">
                   <Fingerprint :size="16" />
                   {{ item.pasajero.tiene_huella ? textoHuella(item.pasajero) : 'Huella no verificada: debe pasar por plataforma' }}
                 </p>
               </div>
 
-              <div v-if="item.pasajero && esMenor(item.pasajero)" class="mt-3 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm">
-                <p class="flex items-center gap-2 font-black text-yellow-950">
+              <div v-if="item.pasajero && esMenor(item.pasajero)" class="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm">
+                <p class="flex items-center gap-2 font-bold text-amber-900">
                   <Link2 :size="16" />
                   Menor de edad: enlazar adulto
                 </p>
-                <select v-model="item.adulto_resp_id" class="field mt-2">
+                <select v-model="item.adulto_resp_id" class="form-input mt-2">
                   <option value="">Seleccionar adulto responsable</option>
                   <option v-for="adulto in adultosDisponibles(index)" :key="adulto.id" :value="adulto.id">
                     {{ nombreCompleto(adulto) }}
                   </option>
                 </select>
-                <p v-if="adultoNombre(item)" class="mt-2 font-bold text-yellow-950">
+                <p v-if="adultoNombre(item)" class="mt-2 font-semibold text-amber-900">
                   {{ adultoNombre(item) }} viajara con {{ nombreCompleto(item.pasajero) }}.
                 </p>
-                <p v-else class="mt-2 font-bold text-yellow-900">
+                <p v-else class="mt-2 font-semibold text-amber-800">
                   Agrega o busca un adulto como otro pasajero de esta venta.
                 </p>
               </div>
 
-              <p v-if="item.error" class="mt-3 rounded-md bg-red-50 p-2 text-sm font-bold text-red-800">{{ item.error }}</p>
+              <p v-if="item.error" class="mt-3 rounded-lg bg-red-50 p-2 text-sm font-semibold text-red-800">{{ item.error }}</p>
             </article>
           </div>
         </section>
 
-        <section class="panel rounded-lg p-4">
-          <h2 class="mb-3 font-black text-slate-800">3. Metodo y asiento activo</h2>
-          <select v-model="metodoPago" class="field mb-3">
+        <section class="card p-5">
+          <h2 class="mb-3 font-bold text-lg text-slate-800">3. Metodo y asiento activo</h2>
+          <select v-model="metodoPago" class="form-input mb-3">
             <option value="efectivo">Efectivo</option>
             <option value="qr_bancario">QR bancario</option>
             <option value="tarjeta">Tarjeta</option>
           </select>
 
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-            <p class="text-sm font-bold text-slate-500">Asignando asiento a</p>
-            <p class="font-black text-slate-900">
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p class="text-sm font-semibold text-slate-500">Asignando asiento a</p>
+            <p class="font-bold text-slate-900">
               Pasajero {{ pasajeroActivoIndex + 1 }}{{ pasajeroActivo?.pasajero ? ` - ${nombreCompleto(pasajeroActivo.pasajero)}` : '' }}
             </p>
-            <p class="mt-1 text-sm font-semibold text-slate-600">Haz clic en un asiento libre del croquis para este pasajero.</p>
+            <p class="mt-1 text-sm font-medium text-slate-600">Haz clic en un asiento libre del croquis para este pasajero.</p>
           </div>
         </section>
       </aside>
@@ -121,20 +121,32 @@
           @select="seleccionarAsiento"
         />
 
-        <section class="panel rounded-lg p-4">
-          <h2 class="mb-3 font-black text-slate-800">Confirmar</h2>
+        <section class="card p-5">
+          <h2 class="mb-3 font-bold text-lg text-slate-800">Confirmar</h2>
           <div class="grid gap-3 md:grid-cols-4">
-            <div><p class="text-sm font-bold text-slate-500">Viaje</p><p class="font-black">{{ selectedViaje?.ruta?.codigo || '-' }}</p></div>
-            <div><p class="text-sm font-bold text-slate-500">Pasajeros</p><p class="font-black">{{ pasajerosListos }} de {{ cantidadPasajeros }}</p></div>
-            <div><p class="text-sm font-bold text-slate-500">Asientos</p><p class="font-black">{{ resumenAsientos }}</p></div>
-            <div><p class="text-sm font-bold text-slate-500">Total aprox.</p><p class="font-black">Bs {{ total }}</p></div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Viaje</p>
+              <p class="font-bold text-slate-800">{{ selectedViaje?.ruta?.codigo || '-' }}</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Pasajeros</p>
+              <p class="font-bold text-slate-800">{{ pasajerosListos }} de {{ cantidadPasajeros }}</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Asientos</p>
+              <p class="font-bold text-slate-800">{{ resumenAsientos }}</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Total aprox.</p>
+              <p class="font-bold text-blue-600">Bs {{ total }}</p>
+            </div>
           </div>
-          <button class="btn btn-primary mt-4" :disabled="emitiendo" @click="emitir">
+          <button class="btn-primary mt-4" :disabled="emitiendo" @click="emitir">
             <Ticket :size="18" />
             {{ emitiendo ? 'Emitiendo...' : 'Confirmar compra' }}
           </button>
-          <p v-if="error" class="mt-3 rounded-md bg-red-50 p-3 text-sm font-bold text-red-800">{{ error }}</p>
-          <p v-if="message" class="mt-3 rounded-md bg-emerald-50 p-3 text-sm font-bold text-emerald-800">{{ message }}</p>
+          <div v-if="error" class="alert alert-error">{{ error }}</div>
+          <div v-if="message" class="alert alert-success">{{ message }}</div>
         </section>
 
         <div v-if="boletos.length" class="grid gap-4 md:grid-cols-2">
@@ -144,13 +156,13 @@
     </div>
 
     <div v-if="mostrarPago" class="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-4">
-      <div class="w-full max-w-md rounded-xl bg-white p-4 shadow-2xl">
+      <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
         <div class="mb-3 flex items-center justify-between gap-3">
           <div>
-            <p class="text-xs font-black uppercase text-eldorado-teal">Confirmacion de pago</p>
-            <h2 class="text-xl font-black text-slate-900">Finalizar compra</h2>
+            <p class="text-xs font-bold uppercase text-blue-600">Confirmacion de pago</p>
+            <h2 class="text-xl font-bold text-slate-800">Finalizar compra</h2>
           </div>
-          <button class="btn btn-secondary px-3" type="button" :disabled="emitiendo" @click="cerrarPago">Cerrar</button>
+          <button class="btn-secondary px-3" type="button" :disabled="emitiendo" @click="cerrarPago">Cerrar</button>
         </div>
         <PaymentSimulator :amount="total" :method="metodoPago" @paid-change="finalizarPagoSimulado" />
       </div>
@@ -195,7 +207,6 @@ const asientosKinds = computed(() => Object.fromEntries(pasajeros.value.filter((
 const resumenAsientos = computed(() => pasajeros.value.map((item, index) => item.asiento ? `P${index + 1}: ${item.asiento.numero}` : null).filter(Boolean).join(' / ') || '-');
 const total = computed(() => {
   const precio = Number(selectedViaje.value?.precio_final || 0);
-
   return pasajeros.value.reduce((sum, item) => {
     if (!item.pasajero?.id) return sum + precio;
     return sum + (edad(item.pasajero.fecha_nacimiento) >= 60 ? precio * 0.8 : precio);
@@ -222,9 +233,7 @@ async function cargarViajes() {
 }
 
 async function seleccionarViaje() {
-  pasajeros.value.forEach((item) => {
-    item.asiento = null;
-  });
+  pasajeros.value.forEach((item) => { item.asiento = null; });
   boletos.value = [];
   if (selectedViajeId.value) {
     await asientosStore.cargar(selectedViajeId.value);
@@ -333,9 +342,7 @@ async function emitir(pagoYaValidado = false) {
 
     message.value = 'Compra confirmada. Los asientos quedaron asignados al viaje.';
     await asientosStore.cargar(selectedViajeId.value);
-    pasajeros.value.forEach((item) => {
-      item.asiento = null;
-    });
+    pasajeros.value.forEach((item) => { item.asiento = null; });
     pagoConfirmado.value = metodoPago.value === 'efectivo';
   } catch (err) {
     error.value = err.message || 'No se pudo emitir la compra.';
@@ -371,9 +378,7 @@ function nuevoPasajero(index) {
 }
 
 function adultosDisponibles(indexActual) {
-  return pasajeros.value
-    .filter((item, index) => index !== indexActual && item.pasajero?.id && !esMenor(item.pasajero))
-    .map((item) => item.pasajero);
+  return pasajeros.value.filter((item, index) => index !== indexActual && item.pasajero?.id && !esMenor(item.pasajero)).map((item) => item.pasajero);
 }
 
 function autoAsignarAdultos() {
@@ -395,10 +400,7 @@ function adultoNombre(item) {
 function menoresVinculados(itemAdulto) {
   if (!itemAdulto.pasajero?.id) return [];
 
-  return pasajeros.value
-    .filter((item) => esMenor(item.pasajero) && Number(item.adulto_resp_id) === Number(itemAdulto.pasajero.id))
-    .map((item) => nombreCompleto(item.pasajero))
-    .filter(Boolean);
+  return pasajeros.value.filter((item) => esMenor(item.pasajero) && Number(item.adulto_resp_id) === Number(itemAdulto.pasajero.id)).map((item) => nombreCompleto(item.pasajero)).filter(Boolean);
 }
 
 function kindPasajero(item) {
@@ -434,3 +436,45 @@ function hora(value) {
   return value ? new Date(value).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', hour12: true }) : '--:--';
 }
 </script>
+
+<style scoped>
+.card {
+  @apply bg-white rounded-xl border border-slate-200;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-primary {
+  @apply flex items-center justify-center gap-2 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors;
+}
+
+.btn-secondary {
+  @apply flex items-center justify-center gap-2 p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors;
+}
+
+.badge {
+  @apply inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full;
+}
+
+.badge-blue {
+  @apply bg-blue-100 text-blue-700;
+}
+
+.badge-teal {
+  @apply bg-teal-100 text-teal-700;
+}
+
+.alert {
+  @apply mt-4 p-3 rounded-xl text-sm font-medium;
+}
+
+.alert-error {
+  @apply bg-red-50 text-red-700;
+}
+
+.alert-success {
+  @apply bg-green-50 text-green-700;
+}
+</style>

@@ -1,123 +1,123 @@
 <template>
-  <section class="space-y-4">
+  <section class="space-y-6">
     <div>
-      <p class="text-sm font-black uppercase text-eldorado-teal">Registro biometrico</p>
-      <h1 class="text-2xl font-black text-slate-900">Registro de pasajero</h1>
+      <p class="text-sm font-bold uppercase text-blue-600">Registro biometrico</p>
+      <h1 class="text-2xl font-bold text-slate-800">Registro de pasajero</h1>
     </div>
 
-    <form class="panel rounded-lg p-4" @submit.prevent="guardar">
-      <div class="grid gap-4 lg:grid-cols-[1fr_360px]">
+    <form class="card p-6" @submit.prevent="guardar">
+      <div class="grid gap-6 lg:grid-cols-[1fr_380px]">
         <div class="space-y-4">
           <section>
-            <h2 class="mb-3 font-black text-slate-800">Datos del pasajero</h2>
+            <h2 class="mb-3 font-bold text-lg text-slate-800">Datos del pasajero</h2>
             <div class="grid gap-3 md:grid-cols-2">
-              <input v-model.trim="form.nombres" class="field" placeholder="Nombres" required />
-              <input v-model.trim="form.apellidos" class="field" placeholder="Apellidos" required />
-              <input v-model.trim="form.numero_ci" class="field" placeholder="CI" required />
-              <input v-model.trim="form.expedido_en" class="field" maxlength="2" placeholder="Expedido en" required />
-              <input v-model="form.fecha_nacimiento" class="field" type="date" required />
-              <input v-model.trim="form.telefono" class="field" placeholder="Telefono" />
+              <input v-model.trim="form.nombres" class="form-input" placeholder="Nombres" required />
+              <input v-model.trim="form.apellidos" class="form-input" placeholder="Apellidos" required />
+              <input v-model.trim="form.numero_ci" class="form-input" placeholder="CI" required />
+              <input v-model.trim="form.expedido_en" class="form-input" maxlength="2" placeholder="Expedido en" required />
+              <input v-model="form.fecha_nacimiento" class="form-input" type="date" required />
+              <input v-model.trim="form.telefono" class="form-input" placeholder="Telefono" />
             </div>
           </section>
 
-          <label class="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 font-bold text-amber-950">
+          <label class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 font-semibold text-amber-900 cursor-pointer">
             <input v-model="viajaConMenor" class="h-5 w-5" type="checkbox" />
             Viaja con menor de edad
           </label>
 
-          <section v-if="viajaConMenor" class="rounded-lg border border-amber-200 bg-white p-4">
+          <section v-if="viajaConMenor" class="rounded-xl border border-amber-200 bg-white p-4">
             <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <h2 class="font-black text-amber-950">Menor acompanante</h2>
+              <h2 class="font-bold text-amber-900">Menor acompanante</h2>
               <div class="flex gap-2">
-                <input v-model="ciMenorBusqueda" class="field min-w-48" placeholder="Buscar CI menor" />
-                <button class="btn btn-secondary" type="button" @click="buscarMenor">
+                <input v-model="ciMenorBusqueda" class="form-input min-w-48" placeholder="Buscar CI menor" />
+                <button class="btn-secondary" type="button" @click="buscarMenor">
                   <Search :size="18" />
                 </button>
               </div>
             </div>
 
             <div class="grid gap-3 md:grid-cols-2">
-              <input v-model.trim="menor.nombres" class="field" placeholder="Nombres del menor" required />
-              <input v-model.trim="menor.apellidos" class="field" placeholder="Apellidos del menor" required />
-              <input v-model.trim="menor.numero_ci" class="field" placeholder="CI del menor" required />
-              <input v-model.trim="menor.expedido_en" class="field" maxlength="2" placeholder="Expedido en" required />
-              <input v-model="menor.fecha_nacimiento" class="field" type="date" required />
-              <select v-model="relacion.tipo_relacion" class="field" required>
+              <input v-model.trim="menor.nombres" class="form-input" placeholder="Nombres del menor" required />
+              <input v-model.trim="menor.apellidos" class="form-input" placeholder="Apellidos del menor" required />
+              <input v-model.trim="menor.numero_ci" class="form-input" placeholder="CI del menor" required />
+              <input v-model.trim="menor.expedido_en" class="form-input" maxlength="2" placeholder="Expedido en" required />
+              <input v-model="menor.fecha_nacimiento" class="form-input" type="date" required />
+              <select v-model="relacion.tipo_relacion" class="form-input" required>
                 <option value="padre">Padre</option>
                 <option value="madre">Madre</option>
                 <option value="tutor_legal">Tutor legal</option>
                 <option value="acompanante_autorizado">Acompanante autorizado</option>
               </select>
-              <input v-model.trim="relacion.numero_permiso_dna" class="field md:col-span-2" placeholder="Permiso DNA / Defensoria" />
+              <input v-model.trim="relacion.numero_permiso_dna" class="form-input md:col-span-2" placeholder="Permiso DNA / Defensoria" />
             </div>
           </section>
         </div>
 
         <aside class="space-y-4">
           <HuellaSimulador @captured="huella = $event" />
-          <section v-if="registro" class="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-            <h2 class="font-black text-emerald-950">Registro guardado</h2>
+          <section v-if="registro" class="rounded-xl border border-green-200 bg-green-50 p-4">
+            <h2 class="font-bold text-green-900">Registro guardado</h2>
             <dl class="mt-3 space-y-2 text-sm">
               <div>
-                <dt class="font-bold text-emerald-800">Clave</dt>
-                <dd class="font-mono text-emerald-950">{{ registro.clave }}</dd>
+                <dt class="font-semibold text-green-800">Clave</dt>
+                <dd class="font-mono text-green-950">{{ registro.clave }}</dd>
               </div>
               <div>
-                <dt class="font-bold text-emerald-800">Pasajero</dt>
-                <dd>{{ registro.nombre }}</dd>
+                <dt class="font-semibold text-green-800">Pasajero</dt>
+                <dd class="text-green-900">{{ registro.nombre }}</dd>
               </div>
               <div>
-                <dt class="font-bold text-emerald-800">Huella</dt>
-                <dd>{{ registro.huella }}</dd>
+                <dt class="font-semibold text-green-800">Huella</dt>
+                <dd class="text-green-900">{{ registro.huella }}</dd>
               </div>
               <div v-if="registro.menor">
-                <dt class="font-bold text-emerald-800">Menor vinculado</dt>
-                <dd>{{ registro.menor }}</dd>
+                <dt class="font-semibold text-green-800">Menor vinculado</dt>
+                <dd class="text-green-900">{{ registro.menor }}</dd>
               </div>
             </dl>
           </section>
         </aside>
       </div>
 
-      <div class="mt-4 flex flex-wrap items-center gap-3">
-        <button class="btn btn-primary" :disabled="guardando">
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <button class="btn-primary" :disabled="guardando">
           <Save :size="18" />
           {{ guardando ? 'Guardando...' : 'Guardar pasajero' }}
         </button>
-        <RouterLink class="btn btn-secondary" to="/venta">
+        <RouterLink class="btn-secondary" to="/venta">
           <UserPlus :size="18" />
           Ir a venta
         </RouterLink>
-        <p v-if="message" class="rounded-md bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-800">{{ message }}</p>
-        <p v-if="error" class="rounded-md bg-red-50 px-3 py-2 text-sm font-bold text-red-800">{{ error }}</p>
+        <div v-if="message" class="alert alert-success">{{ message }}</div>
+        <div v-if="error" class="alert alert-error">{{ error }}</div>
       </div>
     </form>
 
-    <section class="panel rounded-lg p-4">
-      <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 class="font-black text-slate-800">Pasajeros registrados</h2>
-        <button class="btn btn-secondary" type="button" @click="cargarPasajeros">Actualizar</button>
+    <section class="card p-5">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="font-bold text-lg text-slate-800">Pasajeros registrados</h2>
+        <button class="btn-secondary" type="button" @click="cargarPasajeros">Actualizar</button>
       </div>
       <div class="grid gap-3 md:grid-cols-4">
-        <input v-model="filtros.nombre" class="field" placeholder="Filtrar por nombre" @input="cargarPasajeros" />
-        <select v-model="filtros.expedido_en" class="field" @change="cargarPasajeros">
+        <input v-model="filtros.nombre" class="form-input" placeholder="Filtrar por nombre" @input="cargarPasajeros" />
+        <select v-model="filtros.expedido_en" class="form-input" @change="cargarPasajeros">
           <option value="">Todos los departamentos</option>
           <option v-for="dep in departamentos" :key="dep" :value="dep">{{ dep }}</option>
         </select>
-        <select v-model="filtros.es_menor" class="field" @change="cargarPasajeros">
+        <select v-model="filtros.es_menor" class="form-input" @change="cargarPasajeros">
           <option value="">Todas las edades</option>
           <option value="0">Mayores de edad</option>
           <option value="1">Menores de edad</option>
         </select>
-        <select v-model="filtros.huella" class="field" @change="cargarPasajeros">
+        <select v-model="filtros.huella" class="form-input" @change="cargarPasajeros">
           <option value="">Todas las huellas</option>
           <option value="verificada">Huella verificada</option>
           <option value="pendiente">Huella no verificada</option>
         </select>
       </div>
 
-      <div class="table-wrap mt-4">
-        <table>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full">
           <thead>
             <tr>
               <th>Nombre</th>
@@ -130,16 +130,16 @@
           </thead>
           <tbody>
             <tr v-for="pasajero in pasajeros" :key="pasajero.id">
-              <td class="font-bold">{{ nombreCompleto(pasajero) }}</td>
-              <td>{{ pasajero.numero_ci }}</td>
-              <td>{{ pasajero.edad }}</td>
-              <td>{{ pasajero.expedido_en }}</td>
+              <td class="font-semibold text-slate-800">{{ nombreCompleto(pasajero) }}</td>
+              <td class="text-slate-600">{{ pasajero.numero_ci }}</td>
+              <td class="text-slate-600">{{ pasajero.edad }}</td>
+              <td class="text-slate-600">{{ pasajero.expedido_en }}</td>
               <td>
-                <span class="chip" :class="pasajero.tiene_huella ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'">
+                <span class="badge" :class="pasajero.tiene_huella ? 'badge-green' : 'badge-amber'">
                   {{ pasajero.tiene_huella ? 'Verificada' : 'No verificada' }}
                 </span>
               </td>
-              <td>{{ menoresTexto(pasajero) }}</td>
+              <td class="text-slate-600">{{ menoresTexto(pasajero) }}</td>
             </tr>
           </tbody>
         </table>
@@ -291,3 +291,65 @@ function menoresTexto(pasajero) {
   return menores.length ? menores.join(', ') : '-';
 }
 </script>
+
+<style scoped>
+.card {
+  @apply bg-white rounded-xl border border-slate-200;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-primary {
+  @apply flex items-center justify-center gap-2 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors;
+}
+
+.btn-secondary {
+  @apply flex items-center justify-center gap-2 py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors;
+}
+
+.badge {
+  @apply inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full;
+}
+
+.badge-green {
+  @apply bg-green-100 text-green-700;
+}
+
+.badge-amber {
+  @apply bg-amber-100 text-amber-700;
+}
+
+.alert {
+  @apply p-3 rounded-xl text-sm font-medium;
+}
+
+.alert-success {
+  @apply bg-green-50 text-green-700;
+}
+
+.alert-error {
+  @apply bg-red-50 text-red-700;
+}
+
+table {
+  @apply w-full text-sm;
+}
+
+thead {
+  @apply bg-slate-50 border-b border-slate-200;
+}
+
+th {
+  @apply px-4 py-3 text-left font-semibold text-slate-600;
+}
+
+tbody tr {
+  @apply border-b border-slate-100 last:border-0 hover:bg-slate-50;
+}
+
+td {
+  @apply px-4 py-3;
+}
+</style>

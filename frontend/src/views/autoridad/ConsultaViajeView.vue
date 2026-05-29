@@ -1,236 +1,234 @@
 <template>
-  <main class="app-shell min-h-screen px-4 py-8">
-    <section class="mx-auto max-w-7xl space-y-5">
-      <header class="panel overflow-hidden rounded-lg">
-        <div class="grid gap-4 p-5 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div>
-            <p class="text-sm font-black uppercase text-eldorado-teal">Consulta publica y autoridad</p>
-            <h1 class="text-3xl font-black text-slate-950">Viajes, manifiestos y boletos</h1>
-            <p class="mt-2 max-w-3xl font-semibold text-slate-600">
-              Autoridades pueden consultar manifiestos por codigo de viaje. Los pasajeros pueden escribir su carnet para ver sus boletos, QR y rastrear su bus.
-            </p>
-          </div>
-          <nav class="flex flex-wrap gap-2">
-            <RouterLink class="btn btn-secondary" to="/">Inicio</RouterLink>
-            <RouterLink class="btn btn-secondary" to="/registro">Registrarse</RouterLink>
-            <RouterLink class="btn btn-secondary" to="/boleteria">Comprar boletos</RouterLink>
-            <RouterLink class="btn btn-secondary" to="/rastrear">Rastrear bus</RouterLink>
-          </nav>
+  <section class="space-y-6">
+    <header class="card overflow-hidden">
+      <div class="grid gap-4 p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div>
+          <p class="text-sm font-bold uppercase text-blue-600">Consulta publica y autoridad</p>
+          <h1 class="text-3xl font-bold text-slate-800">Viajes, manifiestos y boletos</h1>
+          <p class="mt-2 max-w-3xl text-slate-600">
+            Autoridades pueden consultar manifiestos por codigo de viaje. Los pasajeros pueden escribir su carnet para ver sus boletos, QR y rastrear su bus.
+          </p>
         </div>
-        <div class="h-2 bg-gradient-to-r from-teal-600 via-cyan-500 to-amber-400"></div>
-      </header>
+        <nav class="flex flex-wrap gap-2">
+          <RouterLink class="btn-secondary" to="/">Inicio</RouterLink>
+          <RouterLink class="btn-secondary" to="/registro">Registrarse</RouterLink>
+          <RouterLink class="btn-secondary" to="/boleteria">Comprar boletos</RouterLink>
+          <RouterLink class="btn-secondary" to="/rastrear">Rastrear bus</RouterLink>
+        </nav>
+      </div>
+      <div class="h-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-400"></div>
+    </header>
 
-      <section class="grid gap-4 lg:grid-cols-2">
-        <article class="panel rounded-lg p-5">
-          <div class="flex items-start gap-3">
-            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-teal-100 text-teal-800">
-              <ShieldCheck :size="22" />
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="card p-6">
+        <div class="flex items-start gap-4">
+          <div class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-700">
+            <ShieldCheck :size="24" />
+          </div>
+          <div>
+            <p class="text-xs font-bold uppercase text-blue-700">Autoridades</p>
+            <h2 class="text-xl font-bold text-slate-800">Manifiesto por codigo de viaje</h2>
+            <p class="mt-1 text-sm text-slate-600">Escribe el codigo de viaje VJ-AAAAMMDD-NNN que aparece en cada boleto.</p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <input v-model.trim="codigo" class="form-input min-w-64 flex-1" placeholder="Ejemplo: VJ-20260512-001" @keyup.enter="consultar" />
+          <button class="btn-primary" :disabled="consultando" @click="consultar">
+            <LoaderCircle v-if="consultando" class="animate-spin" :size="18" />
+            <Search v-else :size="18" />
+            {{ consultando ? 'Consultando...' : 'Consultar' }}
+          </button>
+        </div>
+        <div v-if="error" class="alert alert-error mt-3">{{ error }}</div>
+      </article>
+
+      <article class="card p-6">
+        <div class="flex items-start gap-4">
+          <div class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-cyan-100 text-cyan-700">
+            <Ticket :size="24" />
+          </div>
+          <div>
+            <p class="text-xs font-bold uppercase text-cyan-700">Pasajeros</p>
+            <h2 class="text-xl font-bold text-slate-800">Buscar boletos por carnet</h2>
+            <p class="mt-1 text-sm text-slate-600">Escribe tu CI para ver los viajes que compraste, descargar el comprobante o imprimir el QR.</p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <input v-model.trim="ciCliente" class="form-input min-w-64 flex-1" placeholder="Carnet de identidad" @keyup.enter="consultarBoletos" />
+          <button class="btn-primary" :disabled="consultandoCliente" @click="consultarBoletos">
+            <LoaderCircle v-if="consultandoCliente" class="animate-spin" :size="18" />
+            <UserRoundSearch v-else :size="18" />
+            {{ consultandoCliente ? 'Buscando...' : 'Ver mis boletos' }}
+          </button>
+        </div>
+        <div v-if="errorCliente" class="alert alert-error mt-3">{{ errorCliente }}</div>
+      </article>
+    </section>
+
+    <section v-if="viaje" class="space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-xs font-bold uppercase text-slate-500">Resultado autoridad</p>
+          <h2 class="text-2xl font-bold text-slate-800">Manifiesto y croquis del bus</h2>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <RouterLink class="btn-secondary" :to="{ name: 'rastrear-bus', query: { codigo: codigoBus } }">
+            <MapPinned :size="18" />
+            Rastrear bus
+          </RouterLink>
+          <button class="btn-secondary" type="button" @click="imprimirManifiesto">
+            <Printer :size="18" />
+            Descargar constancia PDF
+          </button>
+        </div>
+      </div>
+
+      <section class="grid gap-4 lg:grid-cols-[1fr_300px]">
+        <article class="card p-5">
+          <div class="grid gap-4 md:grid-cols-4">
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Codigo de bus</p>
+              <p class="font-mono text-lg font-bold text-blue-700">{{ codigoBus }}</p>
             </div>
-            <div>
-              <p class="text-xs font-black uppercase text-teal-700">Autoridades</p>
-              <h2 class="text-xl font-black text-slate-900">Manifiesto por codigo de viaje</h2>
-              <p class="mt-1 text-sm font-semibold text-slate-600">Escribe el codigo de viaje VJ-AAAAMMDD-NNN que aparece en cada boleto.</p>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Bus</p>
+              <p class="font-bold text-slate-800">{{ viaje.bus?.placa }} | {{ viaje.bus?.marca }} {{ viaje.bus?.modelo }}</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Ruta</p>
+              <p class="font-bold text-slate-800">{{ viaje.ruta?.origen }} - {{ viaje.ruta?.destino }}</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Pasajeros</p>
+              <p class="font-bold text-slate-800">{{ pasajerosOrdenados.length }} registrados</p>
             </div>
           </div>
-
-          <div class="mt-4 flex flex-wrap gap-2">
-            <input v-model.trim="codigo" class="field min-w-64 flex-1" placeholder="Ejemplo: VJ-20260512-001" @keyup.enter="consultar" />
-            <button class="btn btn-primary" :disabled="consultando" @click="consultar">
-              <LoaderCircle v-if="consultando" class="animate-spin" :size="18" />
-              <Search v-else :size="18" />
-              {{ consultando ? 'Consultando...' : 'Consultar' }}
-            </button>
-          </div>
-          <p v-if="error" class="mt-3 rounded-md bg-red-50 p-3 text-sm font-bold text-red-800">{{ error }}</p>
         </article>
 
-        <article class="panel rounded-lg p-5">
-          <div class="flex items-start gap-3">
-            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-cyan-100 text-cyan-800">
-              <Ticket :size="22" />
-            </div>
-            <div>
-              <p class="text-xs font-black uppercase text-cyan-700">Pasajeros</p>
-              <h2 class="text-xl font-black text-slate-900">Buscar boletos por carnet</h2>
-              <p class="mt-1 text-sm font-semibold text-slate-600">Escribe tu CI para ver los viajes que compraste, descargar el comprobante o imprimir el QR.</p>
-            </div>
-          </div>
-
-          <div class="mt-4 flex flex-wrap gap-2">
-            <input v-model.trim="ciCliente" class="field min-w-64 flex-1" placeholder="Carnet de identidad" @keyup.enter="consultarBoletos" />
-            <button class="btn btn-primary" :disabled="consultandoCliente" @click="consultarBoletos">
-              <LoaderCircle v-if="consultandoCliente" class="animate-spin" :size="18" />
-              <UserRoundSearch v-else :size="18" />
-              {{ consultandoCliente ? 'Buscando...' : 'Ver mis boletos' }}
-            </button>
-          </div>
-          <p v-if="errorCliente" class="mt-3 rounded-md bg-red-50 p-3 text-sm font-bold text-red-800">{{ errorCliente }}</p>
+        <article class="card p-5 text-center">
+          <p class="text-xs font-bold uppercase text-blue-600">QR del bus</p>
+          <img v-if="viaje.bus_qr_imagen" class="mx-auto mt-2 h-40 w-40 rounded-xl border border-slate-200 bg-white p-2" :src="`data:image/png;base64,${viaje.bus_qr_imagen}`" alt="QR del bus" />
+          <p class="mt-2 break-all text-xs font-medium text-slate-500">{{ viaje.bus_qr_url }}</p>
         </article>
       </section>
 
-      <section v-if="viaje" class="space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p class="text-xs font-black uppercase text-slate-500">Resultado autoridad</p>
-            <h2 class="text-2xl font-black text-slate-900">Manifiesto y croquis del bus</h2>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <RouterLink class="btn btn-secondary" :to="{ name: 'rastrear-bus', query: { codigo: codigoBus } }">
-              <MapPinned :size="18" />
-              Rastrear bus
-            </RouterLink>
-            <button class="btn btn-secondary" type="button" @click="imprimirManifiesto">
-              <Printer :size="18" />
-              Descargar constancia PDF
-            </button>
-          </div>
+      <CroquisBus v-if="viaje.croquis_asientos?.length" :asientos="viaje.croquis_asientos" />
+
+      <section class="card p-5">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h3 class="font-bold text-lg text-slate-800">Pasajeros ordenados alfabeticamente</h3>
+          <span class="badge badge-slate">{{ pasajerosOrdenados.length }} en manifiesto</span>
         </div>
-
-        <section class="grid gap-4 lg:grid-cols-[1fr_280px]">
-          <article class="panel rounded-lg p-4">
-            <div class="grid gap-3 md:grid-cols-4">
-              <div>
-                <p class="text-sm font-bold text-slate-500">Codigo de bus</p>
-                <p class="font-mono text-lg font-black text-teal-800">{{ codigoBus }}</p>
-              </div>
-              <div>
-                <p class="text-sm font-bold text-slate-500">Bus</p>
-                <p class="font-black text-slate-900">{{ viaje.bus?.placa }} | {{ viaje.bus?.marca }} {{ viaje.bus?.modelo }}</p>
-              </div>
-              <div>
-                <p class="text-sm font-bold text-slate-500">Ruta</p>
-                <p class="font-black text-slate-900">{{ viaje.ruta?.origen }} - {{ viaje.ruta?.destino }}</p>
-              </div>
-              <div>
-                <p class="text-sm font-bold text-slate-500">Pasajeros</p>
-                <p class="font-black text-slate-900">{{ pasajerosOrdenados.length }} registrados</p>
-              </div>
-            </div>
-          </article>
-
-          <article class="panel rounded-lg p-4 text-center">
-            <p class="text-xs font-black uppercase text-eldorado-teal">QR del bus</p>
-            <img v-if="viaje.bus_qr_imagen" class="mx-auto mt-2 h-40 w-40 rounded-lg border border-slate-200 bg-white p-2" :src="`data:image/png;base64,${viaje.bus_qr_imagen}`" alt="QR del bus" />
-            <p class="mt-2 break-all text-xs font-bold text-slate-500">{{ viaje.bus_qr_url }}</p>
-          </article>
-        </section>
-
-        <CroquisBus v-if="viaje.croquis_asientos?.length" :asientos="viaje.croquis_asientos" />
-
-        <section class="panel rounded-lg p-4">
-          <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h3 class="font-black text-slate-900">Pasajeros ordenados alfabeticamente</h3>
-            <span class="chip bg-slate-100 text-slate-700">{{ pasajerosOrdenados.length }} en manifiesto</span>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Pasajero</th>
-                  <th>CI</th>
-                  <th>Asiento</th>
-                  <th>Estado</th>
-                  <th>Adulto resp.</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="pasajero in pasajerosOrdenados" :key="pasajero.boleto_id">
-                  <td class="font-black text-slate-900">{{ pasajero.nombre_completo }}</td>
-                  <td>{{ pasajero.ci }}</td>
-                  <td>{{ pasajero.asiento || '-' }}</td>
-                  <td><span class="chip" :class="estadoClass(pasajero.estado)">{{ estadoTexto(pasajero.estado) }}</span></td>
-                  <td>{{ pasajero.adulto_responsable || '-' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </section>
-
-      <section v-if="clienteBuscado" class="panel rounded-lg p-5">
-        <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p class="text-xs font-black uppercase text-eldorado-teal">Resultado pasajero</p>
-            <h2 class="text-2xl font-black text-slate-900">{{ tituloCliente }}</h2>
-            <p class="mt-1 font-semibold text-slate-600">
-              {{ boletosCliente.length ? 'Estos son los boletos registrados para ese carnet.' : 'No hay boletos registrados para ese carnet.' }}
-            </p>
-          </div>
-          <span class="chip bg-teal-100 text-teal-900">{{ boletosCliente.length }} boleto{{ boletosCliente.length === 1 ? '' : 's' }}</span>
-        </div>
-
-        <div v-if="boletosCliente.length" class="grid gap-4 lg:grid-cols-2">
-          <article
-            v-for="boleto in boletosCliente"
-            :key="boleto.id"
-            class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-          >
-            <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 bg-slate-50 p-4">
-              <div>
-                <p class="text-xs font-black uppercase text-slate-500">Boleto digital</p>
-                <h3 class="text-lg font-black text-slate-950">{{ boleto.codigo_boleto }}</h3>
-                <p class="mt-1 text-sm font-semibold text-slate-600">
-                  {{ boleto.viaje?.ruta?.origen }} - {{ boleto.viaje?.ruta?.destino }}
-                </p>
-              </div>
-              <span class="chip" :class="estadoClass(boleto.estado)">{{ estadoTexto(boleto.estado) }}</span>
-            </div>
-
-            <div class="grid gap-4 p-4 sm:grid-cols-[150px_1fr]">
-              <div class="rounded-xl border border-slate-200 bg-white p-2">
-                <img v-if="boleto.qr_imagen" class="h-32 w-32 sm:h-36 sm:w-36" :src="`data:image/png;base64,${boleto.qr_imagen}`" alt="QR del boleto" />
-                <div v-else class="grid h-32 w-32 place-items-center rounded-lg bg-slate-100 text-xs font-black text-slate-500 sm:h-36 sm:w-36">
-                  QR
-                </div>
-              </div>
-
-              <dl class="grid gap-2 text-sm">
-                <div>
-                  <dt class="font-bold text-slate-500">Pasajero</dt>
-                  <dd class="font-black text-slate-900">{{ nombreCompleto(boleto.pasajero) }}</dd>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <dt class="font-bold text-slate-500">Asiento</dt>
-                    <dd class="font-black text-slate-900">{{ boleto.asiento?.numero || '-' }}</dd>
-                  </div>
-                  <div>
-                    <dt class="font-bold text-slate-500">Bus</dt>
-                    <dd class="font-black text-slate-900">{{ boleto.viaje?.bus?.placa || '-' }}</dd>
-                  </div>
-                </div>
-                <div>
-                  <dt class="font-bold text-slate-500">Salida</dt>
-                  <dd class="font-black text-slate-900">{{ fechaHora(boleto.viaje?.fecha_salida) }}</dd>
-                </div>
-                <div>
-                  <dt class="font-bold text-slate-500">Total</dt>
-                  <dd class="text-lg font-black text-teal-800">Bs {{ boleto.precio_final }}</dd>
-                </div>
-              </dl>
-            </div>
-
-            <div class="grid gap-2 border-t border-slate-100 p-4 sm:grid-cols-2">
-              <RouterLink class="btn btn-secondary" :to="{ name: 'rastrear-bus', query: { codigo: boleto.codigo_boleto } }">
-                <MapPinned :size="18" />
-                Rastrear bus
-              </RouterLink>
-              <button class="btn btn-primary" type="button" @click="imprimirBoleto(boleto)">
-                <Printer :size="18" />
-                Imprimir / guardar PDF
-              </button>
-            </div>
-          </article>
-        </div>
-
-        <div v-else class="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-          <QrCode class="mx-auto text-slate-400" :size="36" />
-          <p class="mt-3 font-black text-slate-800">No encontramos boletos para ese carnet.</p>
-          <p class="mt-1 text-sm font-semibold text-slate-600">Verifica el CI o compra desde boleteria publica.</p>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr>
+                <th>Pasajero</th>
+                <th>CI</th>
+                <th>Asiento</th>
+                <th>Estado</th>
+                <th>Adulto resp.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="pasajero in pasajerosOrdenados" :key="pasajero.boleto_id">
+                <td class="font-semibold text-slate-900">{{ pasajero.nombre_completo }}</td>
+                <td class="text-slate-600">{{ pasajero.ci }}</td>
+                <td class="text-slate-600">{{ pasajero.asiento || '-' }}</td>
+                <td><span class="badge" :class="estadoClass(pasajero.estado)">{{ estadoTexto(pasajero.estado) }}</span></td>
+                <td class="text-slate-600">{{ pasajero.adulto_responsable || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </section>
-  </main>
+
+    <section v-if="clienteBuscado" class="card p-6">
+      <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p class="text-xs font-bold uppercase text-blue-600">Resultado pasajero</p>
+          <h2 class="text-2xl font-bold text-slate-800">{{ tituloCliente }}</h2>
+          <p class="mt-1 text-slate-600">
+            {{ boletosCliente.length ? 'Estos son los boletos registrados para ese carnet.' : 'No hay boletos registrados para ese carnet.' }}
+          </p>
+        </div>
+        <span class="badge badge-blue">{{ boletosCliente.length }} boleto{{ boletosCliente.length === 1 ? '' : 's' }}</span>
+      </div>
+
+      <div v-if="boletosCliente.length" class="grid gap-4 lg:grid-cols-2">
+        <article
+          v-for="boleto in boletosCliente"
+          :key="boleto.id"
+          class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+        >
+          <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 bg-slate-50 p-4">
+            <div>
+              <p class="text-xs font-bold uppercase text-slate-500">Boleto digital</p>
+              <h3 class="text-lg font-bold text-slate-900">{{ boleto.codigo_boleto }}</h3>
+              <p class="mt-1 text-sm font-medium text-slate-600">
+                {{ boleto.viaje?.ruta?.origen }} - {{ boleto.viaje?.ruta?.destino }}
+              </p>
+            </div>
+            <span class="badge" :class="estadoClass(boleto.estado)">{{ estadoTexto(boleto.estado) }}</span>
+          </div>
+
+          <div class="grid gap-4 p-4 sm:grid-cols-[160px_1fr]">
+            <div class="rounded-xl border border-slate-200 bg-white p-2">
+              <img v-if="boleto.qr_imagen" class="h-32 w-32 sm:h-36 sm:w-36" :src="`data:image/png;base64,${boleto.qr_imagen}`" alt="QR del boleto" />
+              <div v-else class="grid h-32 w-32 place-items-center rounded-lg bg-slate-100 text-xs font-bold text-slate-500 sm:h-36 sm:w-36">
+                QR
+              </div>
+            </div>
+
+            <dl class="grid gap-2 text-sm">
+              <div>
+                <dt class="font-semibold text-slate-500">Pasajero</dt>
+                <dd class="font-bold text-slate-900">{{ nombreCompleto(boleto.pasajero) }}</dd>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <dt class="font-semibold text-slate-500">Asiento</dt>
+                  <dd class="font-bold text-slate-900">{{ boleto.asiento?.numero || '-' }}</dd>
+                </div>
+                <div>
+                  <dt class="font-semibold text-slate-500">Bus</dt>
+                  <dd class="font-bold text-slate-900">{{ boleto.viaje?.bus?.placa || '-' }}</dd>
+                </div>
+              </div>
+              <div>
+                <dt class="font-semibold text-slate-500">Salida</dt>
+                <dd class="font-bold text-slate-900">{{ fechaHora(boleto.viaje?.fecha_salida) }}</dd>
+              </div>
+              <div>
+                <dt class="font-semibold text-slate-500">Total</dt>
+                <dd class="text-lg font-bold text-blue-700">Bs {{ boleto.precio_final }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="grid gap-2 border-t border-slate-100 p-4 sm:grid-cols-2">
+            <RouterLink class="btn-secondary text-center" :to="{ name: 'rastrear-bus', query: { codigo: boleto.codigo_boleto } }">
+              <MapPinned :size="18" />
+              Rastrear bus
+            </RouterLink>
+            <button class="btn-primary" type="button" @click="imprimirBoleto(boleto)">
+              <Printer :size="18" />
+              Imprimir / guardar PDF
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <div v-else class="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+        <QrCode class="mx-auto text-slate-400" :size="36" />
+        <p class="mt-3 font-bold text-slate-800">No encontramos boletos para ese carnet.</p>
+        <p class="mt-1 text-sm text-slate-600">Verifica el CI o compra desde boleteria publica.</p>
+      </div>
+    </section>
+  </section>
 </template>
 
 <script setup>
@@ -273,7 +271,6 @@ const tituloCliente = computed(() => {
   if (cliente.value) {
     return `${nombreCompleto(cliente.value)} tiene los siguientes viajes comprados`;
   }
-
   return 'Usted tiene los siguientes viajes comprados';
 });
 
@@ -340,8 +337,8 @@ function imprimirBoleto(boleto) {
         <style>
           body { font-family: Arial, sans-serif; margin: 0; color: #0f172a; background: #f8fafc; }
           .ticket { max-width: 760px; margin: 28px auto; background: white; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; }
-          .top { padding: 22px; color: white; background: linear-gradient(135deg, #0f766e, #0f172a); }
-          .top small { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #99f6e4; }
+          .top { padding: 22px; color: white; background: linear-gradient(135deg, #2563eb, #1e40af); }
+          .top small { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #93c5fd; }
           h1 { margin: 6px 0 0; font-size: 28px; }
           .body { display: grid; grid-template-columns: 180px 1fr; gap: 20px; padding: 22px; }
           .qr { display: grid; place-items: center; border: 1px solid #dbe5e1; border-radius: 12px; padding: 12px; }
@@ -478,11 +475,11 @@ function estadoTexto(estado) {
 }
 
 function estadoClass(estado) {
-  if (estado === 'pagado') return 'bg-emerald-100 text-emerald-800';
-  if (estado === 'abordado') return 'bg-blue-100 text-blue-800';
-  if (estado === 'pendiente_verificacion') return 'bg-amber-100 text-amber-900';
-  if (['cancelado', 'reembolsado'].includes(estado)) return 'bg-red-100 text-red-800';
-  return 'bg-slate-100 text-slate-700';
+  if (estado === 'pagado') return 'badge-green';
+  if (estado === 'abordado') return 'badge-blue';
+  if (estado === 'pendiente_verificacion') return 'badge-amber';
+  if (['cancelado', 'reembolsado'].includes(estado)) return 'badge-red';
+  return 'badge-slate';
 }
 
 function nombreCompleto(pasajero) {
@@ -507,3 +504,73 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 </script>
+
+<style scoped>
+.card {
+  @apply bg-white rounded-xl border border-slate-200;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-primary {
+  @apply flex items-center justify-center gap-2 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors;
+}
+
+.btn-secondary {
+  @apply flex items-center justify-center gap-2 py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors;
+}
+
+.badge {
+  @apply inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full;
+}
+
+.badge-blue {
+  @apply bg-blue-100 text-blue-700;
+}
+
+.badge-green {
+  @apply bg-green-100 text-green-700;
+}
+
+.badge-amber {
+  @apply bg-amber-100 text-amber-700;
+}
+
+.badge-red {
+  @apply bg-red-100 text-red-700;
+}
+
+.badge-slate {
+  @apply bg-slate-100 text-slate-700;
+}
+
+.alert {
+  @apply p-3 rounded-xl text-sm font-medium;
+}
+
+.alert-error {
+  @apply bg-red-50 text-red-700;
+}
+
+table {
+  @apply w-full text-sm;
+}
+
+thead {
+  @apply bg-slate-50 border-b border-slate-200;
+}
+
+th {
+  @apply px-4 py-3 text-left font-semibold text-slate-600;
+}
+
+tbody tr {
+  @apply border-b border-slate-100 last:border-0 hover:bg-slate-50;
+}
+
+td {
+  @apply px-4 py-3;
+}
+</style>

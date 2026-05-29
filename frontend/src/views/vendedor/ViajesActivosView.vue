@@ -1,83 +1,83 @@
 <template>
-  <section class="space-y-4">
+  <section class="space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <p class="text-sm font-black uppercase text-eldorado-teal">Salidas disponibles</p>
-        <h1 class="text-2xl font-black text-slate-900">Viajes activos</h1>
+        <p class="text-sm font-bold uppercase text-blue-600">Salidas disponibles</p>
+        <h1 class="text-2xl font-bold text-slate-800">Viajes activos</h1>
       </div>
       <div class="flex flex-wrap gap-2">
-        <RouterLink class="btn btn-primary" to="/venta/viajes/nuevo">
+        <RouterLink class="btn-primary" to="/venta/viajes/nuevo">
           <Plus :size="18" />
           Agregar viaje
         </RouterLink>
-        <button class="btn btn-secondary" @click="cargar">
+        <button class="btn-secondary" @click="cargar">
           <RefreshCcw :size="18" />
           Actualizar
         </button>
       </div>
     </div>
 
-    <section class="panel rounded-lg p-4">
+    <section class="card p-5">
       <div class="flex gap-3 items-center">
-        <input v-model="filters.fecha" class="field" type="date" @change="cargar" />
-        <select v-model="filters.estado" class="field" @change="cargar">
+        <input v-model="filters.fecha" class="form-input" type="date" @change="cargar" />
+        <select v-model="filters.estado" class="form-input" @change="cargar">
           <option value="en_venta">En venta</option>
           <option value="en_ruta">En ruta</option>
           <option value="completado">Finalizados</option>
         </select>
       </div>
-      <p v-if="message" class="mt-3 rounded-md bg-emerald-50 p-3 text-sm font-bold text-emerald-800">{{ message }}</p>
-      <p v-if="error" class="mt-3 rounded-md bg-red-50 p-3 text-sm font-bold text-red-800">{{ error }}</p>
+      <div v-if="message" class="alert alert-success mt-3">{{ message }}</div>
+      <div v-if="error" class="alert alert-error mt-3">{{ error }}</div>
     </section>
 
     <div v-if="viajeStore.viajes.length" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       <article
         v-for="viaje in viajeStore.viajes"
         :key="viaje.id"
-        class="panel rounded-lg p-4 cursor-pointer hover:border-teal-400 transition-colors"
+        class="card p-5 cursor-pointer hover:border-blue-300 transition-colors"
         @click="abrirModalMapa(viaje)"
       >
         <div class="flex items-start justify-between gap-3">
           <div>
-            <p class="text-xs font-black uppercase text-teal-600">{{ viaje.codigo_viaje }}</p>
-            <h2 class="text-lg font-black text-slate-900">{{ viaje.ruta?.destino }}</h2>
-            <p class="text-sm text-slate-600">{{ viaje.ruta?.origen }} - {{ viaje.ruta?.codigo }}</p>
+            <p class="text-xs font-bold uppercase text-blue-600">{{ viaje.codigo_viaje }}</p>
+            <h2 class="text-lg font-bold text-slate-800">{{ viaje.ruta?.destino }}</h2>
+            <p class="text-sm text-slate-500">{{ viaje.ruta?.origen }} - {{ viaje.ruta?.codigo }}</p>
           </div>
           <div class="flex flex-col items-end gap-1">
             <EstadoSemaforo :estado="viaje.estado" />
-            <span v-if="viaje.estado === 'en_venta'" class="text-xs font-bold text-slate-400">No ha partido</span>
-            <span v-else-if="viaje.estado === 'completado'" class="text-xs font-bold text-emerald-600">Finalizado</span>
+            <span v-if="viaje.estado === 'en_venta'" class="text-xs font-medium text-slate-400">No ha partido</span>
+            <span v-else-if="viaje.estado === 'completado'" class="text-xs font-medium text-green-600">Finalizado</span>
           </div>
         </div>
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
           <div>
-            <dt class="font-bold text-slate-500">Salida</dt>
-            <dd class="font-black text-slate-900">{{ hora(viaje.fecha_salida) }}</dd>
+            <dt class="font-medium text-slate-500">Salida</dt>
+            <dd class="font-semibold text-slate-800">{{ hora(viaje.fecha_salida) }}</dd>
           </div>
           <div>
-            <dt class="font-bold text-slate-500">Precio</dt>
-            <dd class="font-black text-slate-900">Bs {{ viaje.precio_final }}</dd>
+            <dt class="font-medium text-slate-500">Precio</dt>
+            <dd class="font-semibold text-slate-800">Bs {{ viaje.precio_final }}</dd>
           </div>
           <div>
-            <dt class="font-bold text-slate-500">Bus</dt>
-            <dd>{{ viaje.bus?.placa }}</dd>
+            <dt class="font-medium text-slate-500">Bus</dt>
+            <dd class="text-slate-700">{{ viaje.bus?.placa }}</dd>
           </div>
           <div>
-            <dt class="font-bold text-slate-500">Libres</dt>
-            <dd>{{ viaje.asientos_disponibles_count ?? '-' }}</dd>
+            <dt class="font-medium text-slate-500">Libres</dt>
+            <dd class="text-slate-700">{{ viaje.asientos_disponibles_count ?? '-' }}</dd>
           </div>
         </dl>
         <div class="mt-4 grid gap-2" @click.stop>
           <RouterLink
             v-if="viaje.estado === 'en_venta'"
-            class="btn btn-secondary w-full"
+            class="btn-secondary text-center"
             :to="{ name: 'venta', query: { viaje: viaje.id, fecha: filters.fecha } }"
           >
             Vender boleto
           </RouterLink>
           <button
             v-if="viaje.estado === 'en_venta'"
-            class="btn btn-primary w-full"
+            class="btn-primary"
             type="button"
             :disabled="procesandoId === viaje.id"
             @click="iniciarViaje(viaje)"
@@ -89,46 +89,46 @@
       </article>
     </div>
 
-    <div v-else class="panel rounded-lg p-5 text-sm font-bold text-slate-600">
+    <div v-else class="card p-5 text-sm font-medium text-slate-600 text-center">
       No hay viajes registrados para la fecha seleccionada.
     </div>
 
     <div v-if="mostrarModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" @click.self="cerrarModal">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div class="flex items-center justify-between p-4 border-b border-slate-200">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="flex items-center justify-between p-5 border-b border-slate-200">
           <div>
-            <p class="text-xs font-black uppercase text-teal-600">{{ viajeSeleccionado?.codigo_viaje }}</p>
-            <h2 class="text-xl font-black text-slate-900">{{ viajeSeleccionado?.ruta?.origen }} → {{ viajeSeleccionado?.ruta?.destino }}</h2>
+            <p class="text-xs font-bold uppercase text-blue-600">{{ viajeSeleccionado?.codigo_viaje }}</p>
+            <h2 class="text-xl font-bold text-slate-800">{{ viajeSeleccionado?.ruta?.origen }} → {{ viajeSeleccionado?.ruta?.destino }}</h2>
             <p class="text-sm text-slate-500">{{ viajeSeleccionado?.bus?.placa }} | {{ viajeSeleccionado?.estado }}</p>
           </div>
-          <button class="btn btn-secondary" @click="cerrarModal">
+          <button class="btn-secondary p-2" @click="cerrarModal">
             <X :size="18" />
           </button>
         </div>
 
-        <div class="p-4 flex-1 overflow-auto" style="min-height: 500px;">
+        <div class="p-5 flex-1 overflow-auto" style="min-height: 500px;">
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            <div class="bg-slate-50 rounded-lg p-3 text-center">
+            <div class="bg-slate-50 rounded-xl p-3 text-center">
               <p class="text-xs text-slate-500">Progreso</p>
-              <p class="text-2xl font-black text-teal-600">{{ Math.round(modalProgreso) }}%</p>
+              <p class="text-2xl font-bold text-blue-600">{{ Math.round(modalProgreso) }}%</p>
             </div>
-            <div class="bg-slate-50 rounded-lg p-3 text-center">
+            <div class="bg-slate-50 rounded-xl p-3 text-center">
               <p class="text-xs text-slate-500">Velocidad</p>
-              <p class="text-2xl font-black text-slate-700">{{ modalVelocidad }} km/h</p>
+              <p class="text-2xl font-bold text-slate-700">{{ modalVelocidad }} km/h</p>
             </div>
-            <div class="bg-slate-50 rounded-lg p-3 text-center">
+            <div class="bg-slate-50 rounded-xl p-3 text-center">
               <p class="text-xs text-slate-500">ETA</p>
-              <p class="text-2xl font-black text-slate-700">{{ modalEta }} min</p>
+              <p class="text-2xl font-bold text-slate-700">{{ modalEta }} min</p>
             </div>
-            <div class="bg-slate-50 rounded-lg p-3 text-center">
+            <div class="bg-slate-50 rounded-xl p-3 text-center">
               <p class="text-xs text-slate-500">Estado GPS</p>
-              <p class="text-lg font-black" :class="modalSignalLoss ? 'text-red-600' : 'text-emerald-600'">
+              <p class="text-lg font-bold" :class="modalSignalLoss ? 'text-red-600' : 'text-green-600'">
                 {{ modalSignalLoss ? 'Sin seal' : 'En linea' }}
               </p>
             </div>
           </div>
 
-<div class="rounded-lg overflow-hidden border border-slate-200 relative" style="height: 450px;">
+          <div class="rounded-xl overflow-hidden border border-slate-200 relative" style="height: 450px;">
             <LMap
               v-if="mostrarModal"
               ref="modalMapRef"
@@ -149,7 +149,7 @@
               <LPolyline
                 v-if="modalRoutePoints.length"
                 :lat-lngs="modalRoutePoints"
-                :color="modalSignalLoss ? '#94a3b8' : '#0f766e'"
+                :color="modalSignalLoss ? '#94a3b8' : '#2563eb'"
                 :weight="4"
                 :opacity="0.8"
                 :dash-array="modalSignalLoss ? '15, 10' : undefined"
@@ -161,24 +161,23 @@
                 :icon="modalBusIcon"
               />
 
-              <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur rounded-lg p-3 shadow-lg border border-slate-200 z-[1000]">
+              <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur rounded-xl p-3 shadow-lg border border-slate-200 z-[1000]">
                 <div class="flex items-center justify-between gap-4">
                   <div class="flex-1">
                     <div class="text-xs text-slate-500 mb-1">Progreso del viaje</div>
                     <div class="h-3 bg-slate-200 rounded-full overflow-hidden">
                       <div
-                        class="h-full transition-all duration-500 ease-out rounded-full"
-                        :class="modalSignalLoss ? 'bg-gray-400' : 'bg-gradient-to-r from-teal-500 to-emerald-500'"
+                        class="h-full transition-all duration-500 ease-out rounded-full bg-blue-600"
                         :style="{ width: Math.round(modalProgreso) + '%' }"
                       ></div>
                     </div>
                   </div>
                   <div class="text-center px-4">
-                    <div class="text-2xl font-black" :class="modalSignalLoss ? 'text-gray-400' : 'text-teal-600'">{{ Math.round(modalProgreso) }}%</div>
+                    <div class="text-2xl font-bold" :class="modalSignalLoss ? 'text-slate-400' : 'text-blue-600'">{{ Math.round(modalProgreso) }}%</div>
                     <div class="text-xs text-slate-500">{{ Math.round(modalProgreso * 30 / 100) }}/30 pasos</div>
                   </div>
                   <div class="text-center">
-                    <div class="text-xl font-bold" :class="modalSignalLoss ? 'text-gray-400' : 'text-slate-700'">{{ modalVelocidad }}</div>
+                    <div class="text-xl font-bold text-slate-700">{{ modalVelocidad }}</div>
                     <div class="text-xs text-slate-500">km/h</div>
                   </div>
                   <div class="text-center">
@@ -197,7 +196,7 @@
           <div class="mt-4 flex flex-wrap gap-2">
             <button
               v-if="['en_venta', 'abordando'].includes(viajeSeleccionado?.estado)"
-              class="btn btn-primary"
+              class="btn-primary"
               :disabled="procesandoId === viajeSeleccionado?.id"
               @click="iniciarViaje(viajeSeleccionado)"
             >
@@ -206,7 +205,7 @@
             </button>
             <RouterLink
               v-if="viajeSeleccionado?.estado === 'en_ruta'"
-              class="btn btn-primary"
+              class="btn-primary"
               :to="{ name: 'monitoreo-gps', query: { viaje: viajeSeleccionado.id } }"
             >
               <Maximize2 :size="18" />
@@ -214,7 +213,7 @@
             </RouterLink>
             <button
               v-if="!['completado', 'cancelado'].includes(viajeSeleccionado?.estado)"
-              class="btn btn-secondary"
+              class="btn-secondary"
               @click="finalizarViaje(viajeSeleccionado); cerrarModal()"
             >
               <CheckCircle2 :size="18" />
@@ -222,7 +221,7 @@
             </button>
             <button
               v-if="viajeSeleccionado?.estado !== 'cancelado' && viajeSeleccionado?.estado !== 'en_ruta'"
-              class="btn btn-secondary"
+              class="btn-secondary"
               @click="cancelarViaje(viajeSeleccionado); cerrarModal()"
             >
               <Trash2 :size="18" />
@@ -236,27 +235,24 @@
 </template>
 
 <script setup>
-import { CheckCircle2, MapPin, Maximize2, Navigation, Plus, RefreshCcw, Trash2, X } from 'lucide-vue-next';
-import { LIcon, LMap, LMarker, LPolyline, LPopup, LTileLayer } from '@vue-leaflet/vue-leaflet';
+import { CheckCircle2, Maximize2, Navigation, Plus, RefreshCcw, Trash2, X } from 'lucide-vue-next';
+import { LMap, LMarker, LPolyline, LTileLayer } from '@vue-leaflet/vue-leaflet';
 import L from 'leaflet';
-import { onMounted, onUnmounted, reactive, ref, watch, computed } from 'vue';
+import { onMounted, onUnmounted, reactive, ref, computed } from 'vue';
 import EstadoSemaforo from '../../components/EstadoSemaforo.vue';
 import { cambiarEstadoViaje } from '../../api/viajes';
 import { useViajeStore } from '../../stores/viaje';
-import { estadoSimulacionGps, iniciarViajeGps, avanzarSimulacionGps } from '../../api/gps';
+import { estadoSimulacionGps, iniciarViajeGps } from '../../api/gps';
 
 const viajeStore = useViajeStore();
 const filters = reactive({ fecha: new Date().toISOString().slice(0, 10), estado: 'en_venta' });
 const procesandoId = ref(null);
 const message = ref('');
 const error = ref('');
-const mapRefs = ref({});
-const mapCenters = ref({});
-const busPositions = ref({});
 const waypointsPorViaje = ref({});
 const routePointsPorViaje = ref({});
-const progresos = ref({});
-const simulaciones = ref({});
+const busPositions = ref({});
+const mapCenters = ref({});
 
 const mostrarModal = ref(false);
 const viajeSeleccionado = ref(null);
@@ -349,22 +345,17 @@ function getModalWaypointIcon(index) {
     <span style="margin-top:4px;font-size:11px;font-weight:700;background:rgba(255,255,255,0.95);padding:2px 6px;border-radius:4px;color:#334155;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.15);">${wpName}</span>
   </div>`;
 
-  return L.divIcon({
-    html,
-    className: 'waypoint-icon',
-    iconSize: [40, 50],
-    iconAnchor: [20, 38],
-  });
+  return L.divIcon({ html, className: 'waypoint-icon', iconSize: [40, 50], iconAnchor: [20, 38] });
 }
 
 const modalBusIcon = computed(() => {
-  const color = modalSignalLoss.value ? '#94A3B8' : '#0F766E';
-  const bgBadge = modalSignalLoss.value ? '#EF4444' : '#0F766E';
+  const color = modalSignalLoss.value ? '#94A3B8' : '#2563eb';
+  const bgBadge = modalSignalLoss.value ? '#EF4444' : '#2563eb';
   const badgeText = modalSignalLoss.value ? 'Sin seal' : `${Math.round(modalProgreso.value)}%`;
 
   const html = `<div style="display:flex;flex-direction:column;align-items:center;">
     <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="8" width="40" height="28" rx="6" fill="${color}" stroke="#0F766E" stroke-width="2"/>
+      <rect x="2" y="8" width="40" height="28" rx="6" fill="${color}" stroke="#2563eb" stroke-width="2"/>
       <rect x="6" y="12" width="8" height="8" rx="2" fill="white" opacity="0.9"/>
       <rect x="18" y="12" width="8" height="8" rx="2" fill="white" opacity="0.9"/>
       <rect x="30" y="12" width="8" height="8" rx="2" fill="white" opacity="0.9"/>
@@ -378,28 +369,17 @@ const modalBusIcon = computed(() => {
     <span style="margin-top:2px;font-size:10px;font-weight:700;background:${bgBadge};color:white;padding:2px 6px;border-radius:10px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.3);">${badgeText}</span>
   </div>`;
 
-  return L.divIcon({
-    html,
-    className: 'bus-icon',
-    iconSize: [50, 58],
-    iconAnchor: [25, 28],
-  });
+  return L.divIcon({ html, className: 'bus-icon', iconSize: [50, 58], iconAnchor: [25, 28] });
 });
 
 onMounted(async () => {
   await viajeStore.cargarCatalogos();
   await cargar();
-  setInterval(async () => {
-    await cargarEstadosGps();
-  }, 8000);
+  setInterval(async () => { await cargarEstadosGps(); }, 8000);
 });
 
 async function cargar() {
-  await viajeStore.cargarViajes({
-    fecha: filters.fecha,
-    estado: filters.estado || undefined,
-    per_page: 50
-  });
+  await viajeStore.cargarViajes({ fecha: filters.fecha, estado: filters.estado || undefined, per_page: 50 });
   if (filters.estado === 'en_ruta' || filters.estado === '') {
     await cargarEstadosGps();
   }
@@ -442,9 +422,6 @@ async function cargarEstadosGps() {
         const last = wps[wps.length - 1];
         mapCenters.value[viaje.id] = [(first.lat + last.lat) / 2, (first.lng + last.lng) / 2];
       }
-
-      progresos.value[viaje.id] = data.progreso || 0;
-      simulaciones.value[viaje.id] = data;
     } catch (e) {
       const codigo = viaje.ruta?.codigo || 'CBB-LPZ';
       const wps = RUTAS_WAYPOINTS[codigo] || RUTAS_WAYPOINTS['CBB-LPZ'];
@@ -480,9 +457,6 @@ async function iniciarViaje(viaje) {
         const last = data.waypoints[data.waypoints.length - 1];
         mapCenters.value[viaje.id] = [(first.lat + last.lat) / 2, (first.lng + last.lng) / 2];
       }
-    }
-    if (data.distancia_km) {
-      console.log('Simulacion iniciada: ' + data.distancia_km + ' km, ' + data.llamadas_totales + ' pasos');
     }
 
     viajeSeleccionado.value = { ...viaje };
@@ -560,7 +534,6 @@ async function cargarDatosModal(viajeId) {
     const data = res?.data ?? res;
 
     if (!res || res.success === false) {
-      console.warn('Estado returned error:', res?.message);
       return;
     }
 
@@ -593,22 +566,19 @@ async function cargarDatosModal(viajeId) {
       modalSignalLoss.value = data.signal_loss;
     }
   } catch (e) {
-    console.warn('Error cargando datos modal (no critical):', e?.message || e);
+    console.warn('Error cargando datos modal:', e?.message || e);
   }
 }
 
 async function pollAvanzar() {
   if (!viajeSeleccionado.value?.id) return;
   try {
-    const res = await avanzarSimulacionGps(viajeSeleccionado.value.id);
+    const res = await estadoSimulacionGps(viajeSeleccionado.value.id);
     const data = res?.data ?? res;
 
     if (!res || res.success === false) {
-      console.warn('Avanzar returned error:', res?.message);
       return;
     }
-
-    console.log('[pollAvanzar] Response:', JSON.stringify(data).slice(0, 200));
 
     if (data.waypoints?.length) {
       modalWaypoints.value = data.waypoints;
@@ -639,7 +609,7 @@ async function pollAvanzar() {
       detenerModalRefresh();
     }
   } catch (e) {
-    console.warn('Error poll avanzar (no critical):', e?.message || e);
+    console.warn('Error poll avanzar:', e?.message || e);
   }
 }
 
@@ -666,11 +636,37 @@ function cerrarModal() {
 onUnmounted(() => {
   detenerModalRefresh();
 });
-
-onUnmounted(() => {
-  detenerModalRefresh();
-});
 </script>
+
+<style scoped>
+.card {
+  @apply bg-white rounded-xl border border-slate-200;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-primary {
+  @apply flex items-center justify-center gap-2 py-3 px-5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors;
+}
+
+.btn-secondary {
+  @apply flex items-center justify-center gap-2 py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors;
+}
+
+.alert {
+  @apply p-3 rounded-xl text-sm font-medium;
+}
+
+.alert-success {
+  @apply bg-green-50 text-green-700;
+}
+
+.alert-error {
+  @apply bg-red-50 text-red-700;
+}
+</style>
 
 <style>
 .waypoint-icon, .bus-icon {

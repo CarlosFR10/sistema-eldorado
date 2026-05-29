@@ -1,42 +1,39 @@
 <template>
-  <section class="grid gap-4 lg:grid-cols-[380px_1fr]">
+  <section class="grid gap-6 lg:grid-cols-[400px_1fr]">
     <aside class="space-y-4">
-      <section class="panel rounded-lg p-4">
+      <section class="card p-5">
         <div class="mb-3 flex items-center justify-between gap-3">
           <div>
-            <p class="text-sm font-black uppercase text-eldorado-teal">GPS Simulator</p>
-            <h1 class="text-xl font-black text-slate-900">Monitoreo de viaje</h1>
+            <p class="text-sm font-bold uppercase text-blue-600">GPS Simulator</p>
+            <h1 class="text-xl font-bold text-slate-800">Monitoreo de viaje</h1>
           </div>
-          <button class="btn btn-secondary" :disabled="!viajeId" @click="recargar">
+          <button class="btn-icon" :disabled="!viajeId" @click="recargar">
             <RefreshCcw :size="18" />
           </button>
         </div>
-        <div v-if="viajeId" class="mt-2 space-y-2 text-sm">
-          <p><span class="font-bold text-slate-500">Viaje ID:</span> {{ viajeId }}</p>
-          <p v-if="estadoSim"><span class="font-bold text-slate-500">Estado:</span> {{ estadoSim.estado }}</p>
+        <div v-if="viajeId" class="mt-2 space-y-1 text-sm">
+          <p class="text-slate-600"><span class="font-semibold">Viaje ID:</span> {{ viajeId }}</p>
+          <p v-if="estadoSim" class="text-slate-600"><span class="font-semibold">Estado:</span> {{ estadoSim.estado }}</p>
         </div>
-        <p v-if="!viajeId" class="mt-2 text-sm text-slate-500">No hay viaje seleccionado.</p>
+        <p v-else class="mt-2 text-sm text-slate-500">No hay viaje seleccionado.</p>
       </section>
 
-      <section v-if="estadoSim" class="panel rounded-lg p-4">
-        <div class="mb-3 flex items-center justify-between">
-          <h2 class="font-black text-slate-800">Estado del viaje</h2>
-          <span
-            class="chip"
-            :class="estadoSim.signal_loss ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'"
-          >
+      <section v-if="estadoSim" class="card p-5">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="font-bold text-lg text-slate-800">Estado del viaje</h2>
+          <span class="badge" :class="estadoSim.signal_loss ? 'badge-red' : 'badge-green'">
             {{ estadoSim.signal_loss ? 'Sin seal' : 'En linea' }}
           </span>
         </div>
 
         <div class="mb-4">
-          <div class="flex justify-between text-sm font-bold text-slate-600 mb-1">
+          <div class="flex justify-between text-sm font-semibold text-slate-600 mb-1.5">
             <span>Progreso</span>
-            <span>{{ Math.round(estadoSim.progreso || 0) }}%</span>
+            <span class="text-blue-600">{{ Math.round(estadoSim.progreso || 0) }}%</span>
           </div>
-          <div class="h-3 w-full rounded-full bg-slate-200">
+          <div class="h-3 w-full rounded-full bg-slate-100">
             <div
-              class="h-3 rounded-full bg-teal-600 transition-all duration-1000"
+              class="h-3 rounded-full bg-blue-600 transition-all duration-1000"
               :style="{ width: `${Math.round(estadoSim.progreso || 0)}%` }"
             />
           </div>
@@ -44,56 +41,56 @@
 
         <dl class="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <dt class="font-bold text-slate-500">Velocidad</dt>
-            <dd class="font-black text-slate-900">{{ estadoSim.velocidad || 0 }} km/h</dd>
+            <dt class="font-semibold text-slate-500">Velocidad</dt>
+            <dd class="font-bold text-slate-800">{{ estadoSim.velocidad || 0 }} km/h</dd>
           </div>
           <div>
-            <dt class="font-bold text-slate-500">ETA</dt>
-            <dd class="font-black text-slate-900">{{ estadoSim.eta_minutos || 0 }} min</dd>
+            <dt class="font-semibold text-slate-500">ETA</dt>
+            <dd class="font-bold text-slate-800">{{ estadoSim.eta_minutos || 0 }} min</dd>
           </div>
           <div class="col-span-2">
-            <dt class="font-bold text-slate-500">Waypoint actual</dt>
-            <dd class="font-black text-teal-700">{{ estadoSim.waypoint_actual || '-' }}</dd>
+            <dt class="font-semibold text-slate-500">Waypoint actual</dt>
+            <dd class="font-bold text-blue-700">{{ estadoSim.waypoint_actual || '-' }}</dd>
           </div>
           <div class="col-span-2">
-            <dt class="font-bold text-slate-500">Siguiente</dt>
-            <dd class="font-black text-teal-700">{{ estadoSim.waypoint_siguiente || '-' }}</dd>
+            <dt class="font-semibold text-slate-500">Siguiente</dt>
+            <dd class="font-bold text-blue-700">{{ estadoSim.waypoint_siguiente || '-' }}</dd>
           </div>
           <div class="col-span-2">
-            <dt class="font-bold text-slate-500">Mensaje</dt>
+            <dt class="font-semibold text-slate-500">Mensaje</dt>
             <dd class="font-medium text-slate-700">{{ estadoSim.mensaje || '-' }}</dd>
           </div>
         </dl>
 
-        <div v-if="estadoSim.signal_loss" class="mt-3 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-800">
+        <div v-if="estadoSim.signal_loss" class="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           <strong>Perdida de seal GPS:</strong> El bus esta fuera de cobertura. Reintentando...
         </div>
 
-        <div v-if="estadoSim.fin" class="mt-3 rounded-md bg-emerald-50 border border-emerald-200 p-3 text-sm text-emerald-800">
+        <div v-if="estadoSim.fin" class="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
           <strong>Viaje finalizado!</strong> El bus llego a su destino.
         </div>
 
-        <div v-if="errorMsg" class="mt-3 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-800">
+        <div v-if="errorMsg" class="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           {{ errorMsg }}
         </div>
       </section>
 
-      <section v-else class="panel rounded-lg p-4 text-center text-slate-500">
-        <p class="font-bold">No hay simulacion activa.</p>
+      <section v-else class="card p-5 text-center text-slate-500">
+        <p class="font-semibold">No hay simulacion activa.</p>
         <p class="text-sm mt-1">Inicia un viaje desde Viajes Activos.</p>
       </section>
 
-      <section class="panel rounded-lg p-4">
-        <h2 class="mb-3 font-black text-slate-800">Waypoints de la ruta</h2>
+      <section class="card p-5">
+        <h2 class="mb-3 font-bold text-lg text-slate-800">Waypoints de la ruta</h2>
         <div class="space-y-1">
           <div
             v-for="(wp, i) in waypoints"
             :key="i"
-            class="flex items-center gap-2 text-sm p-2 rounded"
+            class="flex items-center gap-2 text-sm p-2 rounded-lg"
             :class="i === 0 ? 'bg-green-50' : i === waypoints.length - 1 ? 'bg-red-50' : 'bg-slate-50'"
           >
-            <span class="text-lg">{{ i === 0 ? '🟢' : i === waypoints.length - 1 ? '🔴' : '⚪' }}</span>
-            <span class="font-medium">{{ wp.nombre }}</span>
+            <span class="text-base">{{ i === 0 ? '🟢' : i === waypoints.length - 1 ? '🔴' : '⚪' }}</span>
+            <span class="font-medium text-slate-700">{{ wp.nombre }}</span>
             <span class="text-slate-400 text-xs ml-auto">{{ wp.lat.toFixed(4) }}, {{ wp.lng.toFixed(4) }}</span>
           </div>
         </div>
@@ -110,7 +107,7 @@
       :progreso="estadoSim?.progreso || 0"
       :velocidad="estadoSim?.velocidad || 0"
     />
-    <div v-else class="flex items-center justify-center h-[620px] rounded-lg border border-slate-200 bg-slate-50">
+    <div v-else class="flex items-center justify-center h-[620px] rounded-xl border border-slate-200 bg-slate-50">
       <p class="text-slate-500">Cargando mapa...</p>
     </div>
   </section>
@@ -121,7 +118,7 @@ import { RefreshCcw } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import MapaGps from '../../components/MapaGps.vue';
-import { estadoSimulacionGps, iniciarViajeGps, avanzarSimulacionGps } from '../../api/gps';
+import { estadoSimulacionGps, avanzarSimulacionGps } from '../../api/gps';
 
 const route = useRoute();
 
@@ -261,16 +258,6 @@ async function recargar() {
   await cargarViaje();
 }
 
-function seleccionarBus(item) {
-  if (item.viaje?.id) {
-    detenerPoll();
-    viajeId.value = item.viaje.id;
-    viaje.value = item.viaje;
-    mapKey.value++;
-    cargarViaje();
-  }
-}
-
 watch(() => route.query.viaje, (newId) => {
   if (newId) {
     detenerPoll();
@@ -283,3 +270,25 @@ watch(() => route.query.viaje, (newId) => {
   }
 });
 </script>
+
+<style scoped>
+.card {
+  @apply bg-white rounded-xl border border-slate-200;
+}
+
+.btn-icon {
+  @apply p-2 rounded-lg hover:bg-slate-100 text-slate-500;
+}
+
+.badge {
+  @apply inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full;
+}
+
+.badge-green {
+  @apply bg-green-100 text-green-700;
+}
+
+.badge-red {
+  @apply bg-red-100 text-red-700;
+}
+</style>

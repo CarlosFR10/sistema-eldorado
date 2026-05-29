@@ -2,32 +2,42 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
 const routes = [
-  // Public routes
+  // Public routes with PublicLayout
   {
     path: '/',
-    name: 'inicio-publico',
-    component: () => import('../views/public/HomePublicaView.vue')
+    component: () => import('../layouts/PublicLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'inicio-publico',
+        component: () => import('../views/public/HomePublicaView.vue')
+      },
+      {
+        path: 'boleteria',
+        name: 'boleteria',
+        component: () => import('../views/public/BoleteriaPublicaView.vue')
+      },
+      {
+        path: 'registro',
+        name: 'registro-publico',
+        component: () => import('../views/public/RegistroPublicoView.vue')
+      },
+      {
+        path: 'rastrear',
+        name: 'rastrear-bus',
+        component: () => import('../views/public/RastrearBusView.vue')
+      }
+    ]
   },
-  {
-    path: '/boleteria',
-    name: 'boleteria',
-    component: () => import('../views/public/BoleteriaPublicaView.vue')
-  },
-  {
-    path: '/registro',
-    name: 'registro-publico',
-    component: () => import('../views/public/RegistroPublicoView.vue')
-  },
-  {
-    path: '/rastrear',
-    name: 'rastrear-bus',
-    component: () => import('../views/public/RastrearBusView.vue')
-  },
+
+  // Auth - no layout
   {
     path: '/login',
     name: 'login',
     component: () => import('../views/auth/LoginView.vue')
   },
+
+  // Consulta autoridad - no auth needed, public
   {
     path: '/consulta',
     name: 'consulta-autoridad',

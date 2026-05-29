@@ -1,51 +1,51 @@
 <template>
-  <section class="mx-auto max-w-5xl space-y-4">
+  <section class="mx-auto max-w-5xl space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <p class="text-sm font-black uppercase text-eldorado-teal">Programacion</p>
-        <h1 class="text-2xl font-black text-slate-900">Agregar viaje</h1>
+        <p class="text-sm font-bold uppercase text-blue-600">Programacion</p>
+        <h1 class="text-2xl font-bold text-slate-800">Agregar viaje</h1>
       </div>
-      <RouterLink class="btn btn-secondary" to="/venta/viajes">
+      <RouterLink class="btn-secondary" to="/venta/viajes">
         <ArrowLeft :size="18" />
         Volver a viajes
       </RouterLink>
     </div>
 
-    <form class="panel rounded-lg p-4" @submit.prevent="guardar">
-      <div class="grid gap-4 md:grid-cols-3">
-        <label class="space-y-1">
-          <span class="text-sm font-bold text-slate-600">Ruta</span>
-          <select v-model="form.ruta_id" class="field" required>
+    <form class="card p-6" @submit.prevent="guardar">
+      <div class="grid gap-5 md:grid-cols-3">
+        <div class="space-y-1.5">
+          <label class="text-sm font-semibold text-slate-600">Ruta</label>
+          <select v-model="form.ruta_id" class="form-input" required>
             <option value="">Seleccionar ruta</option>
             <option v-for="ruta in viajeStore.rutas" :key="ruta.id" :value="ruta.id">
               {{ ruta.origen }} - {{ ruta.destino }} | Bs {{ ruta.precio_base }}
             </option>
           </select>
-        </label>
+        </div>
 
-        <label class="space-y-1">
-          <span class="text-sm font-bold text-slate-600">Bus</span>
-          <select v-model="form.bus_id" class="field" required>
+        <div class="space-y-1.5">
+          <label class="text-sm font-semibold text-slate-600">Bus</label>
+          <select v-model="form.bus_id" class="form-input" required>
             <option value="">Seleccionar bus</option>
             <option v-for="bus in viajeStore.buses" :key="bus.id" :value="bus.id">
               {{ bus.placa }} - {{ bus.marca }} {{ bus.modelo }} ({{ bus.capacidad }} asientos)
             </option>
           </select>
-        </label>
+        </div>
 
-        <label class="space-y-1">
-          <span class="text-sm font-bold text-slate-600">Fecha de salida</span>
-          <input v-model="form.fecha" class="field" type="date" required />
-        </label>
+        <div class="space-y-1.5">
+          <label class="text-sm font-semibold text-slate-600">Fecha de salida</label>
+          <input v-model="form.fecha" class="form-input" type="date" required />
+        </div>
 
         <div class="md:col-span-3">
-          <p class="mb-2 text-sm font-bold text-slate-600">
+          <p class="mb-3 text-sm font-semibold text-slate-600">
             Horas disponibles
-            <span v-if="form.bus_id && form.fecha" class="ml-2 text-teal-600">
+            <span v-if="form.bus_id && form.fecha" class="ml-2 text-blue-600 font-medium">
               ({{ horasDisponibles.length }} libres / {{ horasBloqueadas.length }} ocupados / {{ horasPasadas.length }} pasados)
             </span>
           </p>
-          <div v-if="!form.bus_id || !form.fecha" class="rounded-md bg-slate-50 p-3 text-sm text-slate-500">
+          <div v-if="!form.bus_id || !form.fecha" class="rounded-xl bg-slate-50 p-4 text-sm text-slate-500 text-center">
             Seleccione bus y fecha para ver horarios disponibles.
           </div>
           <div v-else-if="cargandoHoras" class="text-sm text-slate-500">Cargando...</div>
@@ -54,9 +54,9 @@
               v-for="hora in horasEstandar"
               :key="hora"
               type="button"
-              class="rounded-lg border px-4 py-3 font-bold transition min-w-[100px] text-center"
+              class="rounded-xl border px-4 py-3 font-semibold transition min-w-[100px] text-center"
               :class="form.hora_salida === hora
-                ? 'border-teal-600 bg-teal-600 text-white shadow-md'
+                ? 'border-blue-600 bg-blue-600 text-white shadow-md'
                 : horasPasadas.includes(hora)
                   ? 'cursor-not-allowed border-slate-300 bg-slate-200 text-slate-400 opacity-70'
                   : horasBloqueadas.includes(hora)
@@ -70,16 +70,16 @@
               <span v-else-if="horasBloqueadas.includes(hora)" class="mt-1 block text-xs font-normal">Ocupado</span>
             </button>
           </div>
-          <p v-if="form.hora_salida && !horasBloqueadas.includes(form.hora_salida)" class="mt-2 text-sm font-bold text-teal-600">
+          <p v-if="form.hora_salida && !horasBloqueadas.includes(form.hora_salida)" class="mt-2 text-sm font-semibold text-blue-600">
             Hora seleccionada: {{ form.hora_salida }}
           </p>
-          <p v-else-if="!form.hora_salida && horasDisponibles.length === 0" class="mt-2 text-sm font-bold text-red-600">
+          <p v-else-if="!form.hora_salida && horasDisponibles.length === 0" class="mt-2 text-sm font-semibold text-red-600">
             No hay horarios disponibles para este bus en esta fecha.
           </p>
         </div>
 
-        <div v-if="busSeleccionado" class="rounded-lg border border-slate-200 bg-slate-50 p-3 md:col-span-3">
-          <p class="font-black text-slate-900">
+        <div v-if="busSeleccionado" class="rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-3">
+          <p class="font-bold text-slate-900">
             {{ busSeleccionado.placa }} - {{ busSeleccionado.tipo_bus }} - {{ busSeleccionado.capacidad }} asientos
           </p>
           <p class="text-sm text-slate-600">
@@ -88,39 +88,39 @@
           </p>
         </div>
 
-        <label class="space-y-1">
-          <span class="text-sm font-bold text-slate-600">Llegada estimada</span>
-          <input class="field bg-slate-50" :value="fechaLlegadaEstimada" readonly />
-        </label>
+        <div class="space-y-1.5">
+          <label class="text-sm font-semibold text-slate-600">Llegada estimada</label>
+          <input class="form-input bg-slate-100" :value="fechaLlegadaEstimada" readonly />
+        </div>
 
-        <label class="space-y-1">
-          <span class="text-sm font-bold text-slate-600">Precio final</span>
-          <input v-model.number="form.precio_final" class="field" min="0" step="0.01" type="number" required />
-        </label>
+        <div class="space-y-1.5">
+          <label class="text-sm font-semibold text-slate-600">Precio final</label>
+          <input v-model.number="form.precio_final" class="form-input" min="0" step="0.01" type="number" required />
+        </div>
 
-        <label class="space-y-1">
-          <span class="text-sm font-bold text-slate-600">Estado</span>
-          <select v-model="form.estado" class="field">
+        <div class="space-y-1.5">
+          <label class="text-sm font-semibold text-slate-600">Estado</label>
+          <select v-model="form.estado" class="form-input">
             <option value="en_venta">En venta</option>
           </select>
-        </label>
+        </div>
 
-        <label class="space-y-1 md:col-span-3">
-          <span class="text-sm font-bold text-slate-600">Observaciones</span>
-          <textarea v-model="form.observaciones" class="field min-h-20" placeholder="Nota interna opcional"></textarea>
-        </label>
+        <div class="space-y-1.5 md:col-span-3">
+          <label class="text-sm font-semibold text-slate-600">Observaciones</label>
+          <textarea v-model="form.observaciones" class="form-input min-h-20" placeholder="Nota interna opcional"></textarea>
+        </div>
       </div>
 
-      <div class="mt-4 flex flex-wrap items-center gap-3">
+      <div class="mt-6 flex flex-wrap items-center gap-3">
         <button
-          class="btn btn-primary"
+          class="btn-primary"
           :disabled="guardando || !form.hora_salida || horasBloqueadas.includes(form.hora_salida)"
         >
           <Plus :size="18" />
           {{ guardando ? 'Guardando...' : 'Crear viaje' }}
         </button>
-        <p v-if="message" class="rounded-md bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-800">{{ message }}</p>
-        <p v-if="error" class="rounded-md bg-red-50 px-3 py-2 text-sm font-bold text-red-800">{{ error }}</p>
+        <div v-if="message" class="alert alert-success">{{ message }}</div>
+        <div v-if="error" class="alert alert-error">{{ error }}</div>
       </div>
     </form>
   </section>
@@ -198,14 +198,11 @@ async function cargarHorasDisponibles() {
   cargandoHoras.value = true;
   try {
     const response = await apiHorasDisponibles({ bus_id: form.bus_id, fecha: form.fecha });
-    console.log('horasDisponibles response:', response);
     const data = response?.data ?? response;
     horasDisponibles.value = data?.disponibles || [];
     horasBloqueadas.value = data?.bloqueados || [];
     horasPasadas.value = data?.pasados || [];
-    console.log('disponibles:', horasDisponibles.value, 'bloqueados:', horasBloqueadas.value, 'pasados:', horasPasadas.value);
   } catch (err) {
-    console.error('Error cargando horas:', err);
     horasDisponibles.value = [...horasEstandar];
     horasBloqueadas.value = [];
     horasPasadas.value = [];
@@ -263,3 +260,33 @@ function formatDateTimeLocal(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 </script>
+
+<style scoped>
+.card {
+  @apply bg-white rounded-xl border border-slate-200;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-primary {
+  @apply flex items-center justify-center gap-2 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors;
+}
+
+.btn-secondary {
+  @apply flex items-center justify-center gap-2 py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors;
+}
+
+.alert {
+  @apply p-3 rounded-xl text-sm font-medium;
+}
+
+.alert-success {
+  @apply bg-green-50 text-green-700;
+}
+
+.alert-error {
+  @apply bg-red-50 text-red-700;
+}
+</style>
