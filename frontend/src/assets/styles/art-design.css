@@ -1,0 +1,221 @@
+/* ==================== Light Mode Variables ==================== */
+:root {
+  /* Base Colors */
+  --art-color: #ffffff;
+  --theme-color: var(--main-color);
+
+  /* Theme Colors - OKLCH Format */
+  --art-primary: oklch(0.7 0.23 260);
+  --art-secondary: oklch(0.72 0.19 231.6);
+  --art-error: oklch(0.73 0.15 25.3);
+  --art-info: oklch(0.58 0.03 254.1);
+  --art-success: oklch(0.78 0.17 166.1);
+  --art-warning: oklch(0.78 0.14 75.5);
+  --art-danger: oklch(0.68 0.22 25.3);
+
+  /* Gray Scale - Light Mode */
+  --art-gray-100: #f9fafb;
+  --art-gray-200: #f2f4f5;
+  --art-gray-300: #e6eaeb;
+  --art-gray-400: #dbdfe1;
+  --art-gray-500: #949eb7;
+  --art-gray-600: #7987a1;
+  --art-gray-700: #4d5875;
+  --art-gray-800: #383853;
+  --art-gray-900: #323251;
+
+  /* Border Colors */
+  --art-card-border: rgba(0, 0, 0, 0.08);
+
+  --default-border: #e2e8ee;
+  --default-border-dashed: #dbdfe9;
+
+  /* Background Colors */
+  --default-bg-color: #fafbfc;
+  --default-box-color: #ffffff;
+
+  /* Hover Color */
+  --art-hover-color: #edeff0;
+
+  /* Active Color */
+  --art-active-color: #f2f4f5;
+
+  /* Element Component Active Color */
+  --art-el-active-color: #f2f4f5;
+}
+
+/* ==================== Dark Mode Variables ==================== */
+.dark {
+  /* Base Colors */
+  --art-color: #000000;
+
+  /* Gray Scale - Dark Mode */
+  --art-gray-100: #110f0f;
+  --art-gray-200: #17171c;
+  --art-gray-300: #393946;
+  --art-gray-400: #505062;
+  --art-gray-500: #73738c;
+  --art-gray-600: #8f8fa3;
+  --art-gray-700: #ababba;
+  --art-gray-800: #c7c7d1;
+  --art-gray-900: #e3e3e8;
+
+  /* Border Colors */
+  --art-card-border: rgba(255, 255, 255, 0.08);
+
+  --default-border: rgba(255, 255, 255, 0.1);
+  --default-border-dashed: #363843;
+
+  /* Background Colors */
+  --default-bg-color: #070707;
+  --default-box-color: #161618;
+
+  /* Hover Color */
+  --art-hover-color: #252530;
+
+  /* Active Color */
+  --art-active-color: #202226;
+
+  /* Element Component Active Color */
+  --art-el-active-color: #2e2e38;
+}
+
+/* ==================== Custom Classes ==================== */
+
+/* Art Card Base */
+.art-card {
+  background-color: var(--default-box-color);
+  border: 1px solid var(--art-card-border);
+  border-radius: 0.75rem;
+}
+
+/* Art Card Header */
+.art-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--art-card-border);
+}
+
+.art-card-header .title h4 {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.dark .art-card-header .title h4 {
+  color: #f3f4f6;
+}
+
+.art-card-header .title p {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #6b7280;
+}
+
+/* Stats Card */
+.art-stats-card {
+  background-color: var(--default-box-color);
+  border: 1px solid var(--art-card-border);
+  border-radius: 0.75rem;
+  height: 8rem;
+  display: flex;
+  align-items: center;
+  padding: 0 1.25rem;
+  transition: transform 0.2s;
+}
+
+.art-stats-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Flex Utilities */
+.flex-c {
+  display: flex;
+  align-items: center;
+}
+
+.flex-b {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex-cc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-cb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Border Utilities */
+.border-full-d {
+  border: 1px solid var(--default-border);
+}
+
+.border-b-d {
+  border-bottom: 1px solid var(--default-border);
+}
+
+/* Transition Utilities */
+.tad-200 {
+  transition: all 0.2s;
+}
+
+.tad-300 {
+  transition: all 0.3s;
+}
+
+/* Cursor */
+.c-p {
+  cursor: pointer;
+}
+
+/* ==================== Gray Scale Colors ==================== */
+.text-g-100 { color: var(--art-gray-100); }
+.text-g-200 { color: var(--art-gray-200); }
+.text-g-300 { color: var(--art-gray-300); }
+.text-g-400 { color: var(--art-gray-400); }
+.text-g-500 { color: var(--art-gray-500); }
+.text-g-600 { color: var(--art-gray-600); }
+.text-g-700 { color: var(--art-gray-700); }
+.text-g-800 { color: var(--art-gray-800); }
+.text-g-900 { color: var(--art-gray-900); }
+
+.bg-g-100 { background-color: var(--art-gray-100); }
+.bg-g-200 { background-color: var(--art-gray-200); }
+.bg-g-300 { background-color: var(--art-gray-300); }
+.bg-g-400 { background-color: var(--art-gray-400); }
+.bg-g-500 { background-color: var(--art-gray-500); }
+
+/* ==================== Theme Colors ==================== */
+.bg-theme { background-color: var(--art-primary); }
+.text-theme { color: var(--art-primary); }
+
+.bg-success { background-color: var(--art-success); }
+.text-success { color: var(--art-success); }
+
+.bg-warning { background-color: var(--art-warning); }
+.text-warning { color: var(--art-warning); }
+
+.bg-danger { background-color: var(--art-danger); }
+.text-danger { color: var(--art-danger); }
+
+.bg-error { background-color: var(--art-error); }
+.text-error { color: var(--art-error); }
+
+/* ==================== Custom Border Radius ==================== */
+.rounded-custom-xs {
+  border-radius: calc(var(--custom-radius, 8px) / 2);
+}
+
+.rounded-custom-sm {
+  border-radius: calc(var(--custom-radius, 8px) / 2 + 2px);
+}
