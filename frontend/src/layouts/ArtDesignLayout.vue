@@ -245,7 +245,6 @@ const menuItems = [
     ],
   },
   { label: 'GPS', icon: Monitor, path: '/gps/monitoreo' },
-  { label: 'Autoridad', icon: MapPinned, path: '/autoridad/consulta' },
   {
     label: 'Reportes',
     icon: FileBarChart,
