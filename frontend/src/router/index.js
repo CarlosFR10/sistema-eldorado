@@ -18,7 +18,7 @@ const routes = [
 
   {
     path: '/',
-    component: () => import('../layouts/VbenAdminLayout.vue'),
+    component: () => import('../layouts/AuthLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       { path: 'dashboard', name: 'dashboard', component: () => import('../views/admin/DashboardView.vue'), meta: { roles: ['administrador', 'supervisor'] } },
