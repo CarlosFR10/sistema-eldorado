@@ -178,7 +178,7 @@ const route = useRoute();
 const router = useRouter();
 
 const sidebarOpen = ref(false);
-const isDark = ref(false);
+const isDark = ref(localStorage.getItem('theme') === 'dark' || document.documentElement.classList.contains('dark'));
 const showUserMenu = ref(false);
 const openSubmenus = ref([]);
 

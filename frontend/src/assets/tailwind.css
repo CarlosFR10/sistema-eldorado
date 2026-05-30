@@ -10,6 +10,11 @@
     sans-serif;
 }
 
+.dark {
+  color: #f1f5f9;
+  background: #0f172a;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -29,15 +34,22 @@ textarea {
 
 .app-shell {
   min-height: 100vh;
-  background:
-    linear-gradient(180deg, rgba(204, 251, 241, 0.45), rgba(248, 250, 252, 0.95) 320px),
-    #eef3f1;
+  background: linear-gradient(180deg, rgba(204, 251, 241, 0.45), rgba(248, 250, 252, 0.95) 320px), #eef3f1;
+}
+
+.dark .app-shell {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.98) 320px), #0f172a;
 }
 
 .panel {
   border: 1px solid #dbe5e1;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.dark .panel {
+  border-color: #334155;
+  background: rgba(30, 41, 59, 0.92);
 }
 
 .field {
@@ -49,9 +61,20 @@ textarea {
   outline: none;
 }
 
+.dark .field {
+  border-color: #475569;
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
 .field:focus {
   border-color: #0f766e;
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+}
+
+.dark .field:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
 }
 
 .btn {
@@ -79,10 +102,20 @@ textarea {
   color: #fff;
 }
 
+.dark .btn-primary {
+  background: #0d9488;
+}
+
 .btn-secondary {
   border-color: #cbd5d1;
   background: #fff;
   color: #17202a;
+}
+
+.dark .btn-secondary {
+  border-color: #475569;
+  background: #1e293b;
+  color: #f1f5f9;
 }
 
 .btn-danger {
@@ -116,9 +149,27 @@ td {
   vertical-align: top;
 }
 
+.dark th,
+.dark td {
+  border-bottom-color: #334155;
+}
+
 th {
   color: #475569;
   font-size: 0.78rem;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.dark th {
+  color: #94a3b8;
+  background: #1e293b;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+.dark tbody tr:hover {
+  background: #1e293b;
 }
