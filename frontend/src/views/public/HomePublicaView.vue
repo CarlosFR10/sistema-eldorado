@@ -10,22 +10,7 @@
       <div class="moving-bus bus-b"><BusFront :size="24" /></div>
     </div>
 
-    <header class="relative z-10 mx-auto max-w-7xl px-6 py-6">
-      <nav class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
-            <BusFront :size="22" class="text-blue-400" />
-          </div>
-          <span class="text-lg font-bold tracking-tight">Terminal El Dorado</span>
-        </div>
-        <RouterLink to="/login" class="group flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium hover:bg-white/10 transition-all duration-300">
-          <span>Iniciar sesion</span>
-          <ArrowRight :size="16" class="transition-transform group-hover:translate-x-0.5" />
-        </RouterLink>
-      </nav>
-    </header>
-
-    <main class="relative z-10 mx-auto max-w-7xl px-6 pt-12 pb-20">
+    <main class="relative z-10 mx-auto max-w-7xl px-6 pt-20 pb-20">
       <div class="max-w-3xl">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-sm font-medium mb-6">
           <span class="relative flex h-2 w-2">

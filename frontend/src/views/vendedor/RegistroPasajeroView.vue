@@ -1,15 +1,15 @@
 <template>
-  <section class="space-y-6">
+  <section class="space-y-6 dark:text-white">
     <div>
       <p class="text-sm font-bold uppercase text-blue-600">Registro biometrico</p>
-      <h1 class="text-2xl font-bold text-slate-800">Registro de pasajero</h1>
+      <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Registro de pasajero</h1>
     </div>
 
     <form class="card p-6" @submit.prevent="guardar">
       <div class="grid gap-6 lg:grid-cols-[1fr_380px]">
         <div class="space-y-4">
           <section>
-            <h2 class="mb-3 font-bold text-lg text-slate-800">Datos del pasajero</h2>
+            <h2 class="mb-3 font-bold text-lg text-slate-800 dark:text-white">Datos del pasajero</h2>
             <div class="grid gap-3 md:grid-cols-2">
               <input v-model.trim="form.nombres" class="form-input" placeholder="Nombres" required />
               <input v-model.trim="form.apellidos" class="form-input" placeholder="Apellidos" required />
@@ -294,19 +294,27 @@ function menoresTexto(pasajero) {
 
 <style scoped>
 .card {
-  @apply bg-white rounded-xl border border-slate-200;
+  @apply bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700;
 }
 
 .form-input {
-  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500;
 }
 
 .btn-primary {
   @apply flex items-center justify-center gap-2 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors;
 }
 
+.dark .btn-primary {
+  @apply bg-teal-600 hover:bg-teal-700;
+}
+
 .btn-secondary {
   @apply flex items-center justify-center gap-2 py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors;
+}
+
+.dark .btn-secondary {
+  @apply bg-slate-700 hover:bg-slate-600 text-slate-200;
 }
 
 .badge {
@@ -314,11 +322,11 @@ function menoresTexto(pasajero) {
 }
 
 .badge-green {
-  @apply bg-green-100 text-green-700;
+  @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400;
 }
 
 .badge-amber {
-  @apply bg-amber-100 text-amber-700;
+  @apply bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400;
 }
 
 .alert {
@@ -326,11 +334,11 @@ function menoresTexto(pasajero) {
 }
 
 .alert-success {
-  @apply bg-green-50 text-green-700;
+  @apply bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400;
 }
 
 .alert-error {
-  @apply bg-red-50 text-red-700;
+  @apply bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400;
 }
 
 table {
@@ -338,18 +346,18 @@ table {
 }
 
 thead {
-  @apply bg-slate-50 border-b border-slate-200;
+  @apply bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700;
 }
 
 th {
-  @apply px-4 py-3 text-left font-semibold text-slate-600;
+  @apply px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300;
 }
 
 tbody tr {
-  @apply border-b border-slate-100 last:border-0 hover:bg-slate-50;
+  @apply border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/50;
 }
 
 td {
-  @apply px-4 py-3;
+  @apply px-4 py-3 text-slate-600 dark:text-slate-300;
 }
 </style>

@@ -69,7 +69,7 @@ const mobileMenuOpen = ref(false);
 }
 
 .public-header {
-  @apply sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm;
+  @apply sticky top-0 z-50 bg-slate-900 border-b border-white/10 shadow-lg;
 }
 
 .header-container {
@@ -77,11 +77,11 @@ const mobileMenuOpen = ref(false);
 }
 
 .brand {
-  @apply flex items-center gap-2 text-slate-800 hover:text-blue-600 transition-colors;
+  @apply flex items-center gap-2 text-white hover:text-blue-400 transition-colors;
 }
 
 .brand-icon {
-  @apply text-blue-600;
+  @apply text-blue-400;
 }
 
 .brand-text {
@@ -93,23 +93,23 @@ const mobileMenuOpen = ref(false);
 }
 
 .nav-link {
-  @apply text-slate-600 hover:text-blue-600 font-medium transition-colors;
+  @apply text-white hover:text-blue-400 font-medium transition-colors;
 }
 
 .btn-login {
-  @apply flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors;
+  @apply flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-colors;
 }
 
 .mobile-menu-btn {
-  @apply md:hidden p-2 text-slate-600 hover:text-blue-600;
+  @apply md:hidden p-2 text-white hover:text-blue-400;
 }
 
 .mobile-menu {
-  @apply md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3;
+  @apply md:hidden bg-slate-900/95 backdrop-blur-md border-b border-white/10 px-4 py-4 space-y-3;
 }
 
 .mobile-link {
-  @apply block py-2 text-slate-600 hover:text-blue-600 font-medium;
+  @apply block py-2 text-white/80 hover:text-blue-400 font-medium;
 }
 
 .public-main {
@@ -117,7 +117,7 @@ const mobileMenuOpen = ref(false);
 }
 
 .public-footer {
-  @apply bg-slate-800 text-white py-8 mt-auto;
+  @apply bg-slate-900/50 backdrop-blur-sm text-white py-8 mt-auto border-t border-white/10;
 }
 
 .footer-container {

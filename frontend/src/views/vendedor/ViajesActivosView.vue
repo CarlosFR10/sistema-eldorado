@@ -1,9 +1,9 @@
 <template>
-  <section class="space-y-6">
+  <section class="space-y-6 dark:text-white">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
         <p class="text-sm font-bold uppercase text-blue-600">Salidas disponibles</p>
-        <h1 class="text-2xl font-bold text-slate-800">Viajes activos</h1>
+        <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Viajes activos</h1>
       </div>
       <div class="flex flex-wrap gap-2">
         <RouterLink class="btn-primary" to="/venta/viajes/nuevo">
@@ -19,8 +19,8 @@
 
     <section class="card p-5">
       <div class="flex gap-3 items-center">
-        <input v-model="filters.fecha" class="form-input" type="date" @change="cargar" />
-        <select v-model="filters.estado" class="form-input" @change="cargar">
+        <input v-model="filters.fecha" class="form-input dark:text-white" type="date" @change="cargar" />
+        <select v-model="filters.estado" class="form-input dark:text-white" @change="cargar">
           <option value="en_venta">En venta</option>
           <option value="en_ruta">En ruta</option>
           <option value="completado">Finalizados</option>
@@ -34,37 +34,37 @@
       <article
         v-for="viaje in viajeStore.viajes"
         :key="viaje.id"
-        class="card p-5 cursor-pointer hover:border-blue-300 transition-colors"
+        class="card p-5 cursor-pointer hover:border-blue-300 dark:hover:border-teal-500 transition-colors"
         @click="abrirModalMapa(viaje)"
       >
         <div class="flex items-start justify-between gap-3">
           <div>
             <p class="text-xs font-bold uppercase text-blue-600">{{ viaje.codigo_viaje }}</p>
-            <h2 class="text-lg font-bold text-slate-800">{{ viaje.ruta?.destino }}</h2>
-            <p class="text-sm text-slate-500">{{ viaje.ruta?.origen }} - {{ viaje.ruta?.codigo }}</p>
+            <h2 class="text-lg font-bold text-slate-800 dark:text-white">{{ viaje.ruta?.destino }}</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400">{{ viaje.ruta?.origen }} - {{ viaje.ruta?.codigo }}</p>
           </div>
           <div class="flex flex-col items-end gap-1">
             <EstadoSemaforo :estado="viaje.estado" />
-            <span v-if="viaje.estado === 'en_venta'" class="text-xs font-medium text-slate-400">No ha partido</span>
-            <span v-else-if="viaje.estado === 'completado'" class="text-xs font-medium text-green-600">Finalizado</span>
+            <span v-if="viaje.estado === 'en_venta'" class="text-xs font-medium text-slate-400 dark:text-slate-500">No ha partido</span>
+            <span v-else-if="viaje.estado === 'completado'" class="text-xs font-medium text-green-600 dark:text-green-400">Finalizado</span>
           </div>
         </div>
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
           <div>
-            <dt class="font-medium text-slate-500">Salida</dt>
-            <dd class="font-semibold text-slate-800">{{ hora(viaje.fecha_salida) }}</dd>
+            <dt class="font-medium text-slate-500 dark:text-slate-400">Salida</dt>
+            <dd class="font-semibold text-slate-800 dark:text-white">{{ hora(viaje.fecha_salida) }}</dd>
           </div>
           <div>
-            <dt class="font-medium text-slate-500">Precio</dt>
-            <dd class="font-semibold text-slate-800">Bs {{ viaje.precio_final }}</dd>
+            <dt class="font-medium text-slate-500 dark:text-slate-400">Precio</dt>
+            <dd class="font-semibold text-slate-800 dark:text-white">Bs {{ viaje.precio_final }}</dd>
           </div>
           <div>
-            <dt class="font-medium text-slate-500">Bus</dt>
-            <dd class="text-slate-700">{{ viaje.bus?.placa }}</dd>
+            <dt class="font-medium text-slate-500 dark:text-slate-400">Bus</dt>
+            <dd class="text-slate-700 dark:text-slate-300">{{ viaje.bus?.placa }}</dd>
           </div>
           <div>
-            <dt class="font-medium text-slate-500">Libres</dt>
-            <dd class="text-slate-700">{{ viaje.asientos_disponibles_count ?? '-' }}</dd>
+            <dt class="font-medium text-slate-500 dark:text-slate-400">Libres</dt>
+            <dd class="text-slate-700 dark:text-slate-300">{{ viaje.asientos_disponibles_count ?? '-' }}</dd>
           </div>
         </dl>
         <div class="mt-4 grid gap-2" @click.stop>
@@ -89,17 +89,17 @@
       </article>
     </div>
 
-    <div v-else class="card p-5 text-sm font-medium text-slate-600 text-center">
+    <div v-else class="card p-5 text-sm font-medium text-slate-600 dark:text-slate-300 text-center">
       No hay viajes registrados para la fecha seleccionada.
     </div>
 
     <div v-if="mostrarModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" @click.self="cerrarModal">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div class="flex items-center justify-between p-5 border-b border-slate-200">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700">
           <div>
             <p class="text-xs font-bold uppercase text-blue-600">{{ viajeSeleccionado?.codigo_viaje }}</p>
-            <h2 class="text-xl font-bold text-slate-800">{{ viajeSeleccionado?.ruta?.origen }} → {{ viajeSeleccionado?.ruta?.destino }}</h2>
-            <p class="text-sm text-slate-500">{{ viajeSeleccionado?.bus?.placa }} | {{ viajeSeleccionado?.estado }}</p>
+            <h2 class="text-xl font-bold text-slate-800 dark:text-white">{{ viajeSeleccionado?.ruta?.origen }} → {{ viajeSeleccionado?.ruta?.destino }}</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400">{{ viajeSeleccionado?.bus?.placa }} | {{ viajeSeleccionado?.estado }}</p>
           </div>
           <button class="btn-secondary p-2" @click="cerrarModal">
             <X :size="18" />
@@ -108,21 +108,21 @@
 
         <div class="p-5 flex-1 overflow-auto" style="min-height: 500px;">
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            <div class="bg-slate-50 rounded-xl p-3 text-center">
-              <p class="text-xs text-slate-500">Progreso</p>
+            <div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
+              <p class="text-xs text-slate-500 dark:text-slate-400">Progreso</p>
               <p class="text-2xl font-bold text-blue-600">{{ Math.round(modalProgreso) }}%</p>
             </div>
-            <div class="bg-slate-50 rounded-xl p-3 text-center">
-              <p class="text-xs text-slate-500">Velocidad</p>
-              <p class="text-2xl font-bold text-slate-700">{{ modalVelocidad }} km/h</p>
+            <div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
+              <p class="text-xs text-slate-500 dark:text-slate-400">Velocidad</p>
+              <p class="text-2xl font-bold text-slate-700 dark:text-white">{{ modalVelocidad }} km/h</p>
             </div>
-            <div class="bg-slate-50 rounded-xl p-3 text-center">
-              <p class="text-xs text-slate-500">ETA</p>
-              <p class="text-2xl font-bold text-slate-700">{{ modalEta }} min</p>
+            <div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
+              <p class="text-xs text-slate-500 dark:text-slate-400">ETA</p>
+              <p class="text-2xl font-bold text-slate-700 dark:text-white">{{ modalEta }} min</p>
             </div>
-            <div class="bg-slate-50 rounded-xl p-3 text-center">
-              <p class="text-xs text-slate-500">Estado GPS</p>
-              <p class="text-lg font-bold" :class="modalSignalLoss ? 'text-red-600' : 'text-green-600'">
+            <div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
+              <p class="text-xs text-slate-500 dark:text-slate-400">Estado GPS</p>
+              <p class="text-lg font-bold" :class="modalSignalLoss ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'">
                 {{ modalSignalLoss ? 'Sin seal' : 'En linea' }}
               </p>
             </div>
@@ -161,11 +161,11 @@
                 :icon="modalBusIcon"
               />
 
-              <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur rounded-xl p-3 shadow-lg border border-slate-200 z-[1000]">
+              <div class="absolute bottom-3 left-3 right-3 bg-white/95 dark:bg-slate-800/95 backdrop-blur rounded-xl p-3 shadow-lg border border-slate-200 dark:border-slate-700 z-[1000]">
                 <div class="flex items-center justify-between gap-4">
                   <div class="flex-1">
-                    <div class="text-xs text-slate-500 mb-1">Progreso del viaje</div>
-                    <div class="h-3 bg-slate-200 rounded-full overflow-hidden">
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Progreso del viaje</div>
+                    <div class="h-3 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
                       <div
                         class="h-full transition-all duration-500 ease-out rounded-full bg-blue-600"
                         :style="{ width: Math.round(modalProgreso) + '%' }"
@@ -173,16 +173,16 @@
                     </div>
                   </div>
                   <div class="text-center px-4">
-                    <div class="text-2xl font-bold" :class="modalSignalLoss ? 'text-slate-400' : 'text-blue-600'">{{ Math.round(modalProgreso) }}%</div>
-                    <div class="text-xs text-slate-500">{{ Math.round(modalProgreso * 30 / 100) }}/30 pasos</div>
+                    <div class="text-2xl font-bold" :class="modalSignalLoss ? 'text-slate-400 dark:text-slate-500' : 'text-blue-600'">{{ Math.round(modalProgreso) }}%</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">{{ Math.round(modalProgreso * 30 / 100) }}/30 pasos</div>
                   </div>
                   <div class="text-center">
-                    <div class="text-xl font-bold text-slate-700">{{ modalVelocidad }}</div>
-                    <div class="text-xs text-slate-500">km/h</div>
+                    <div class="text-xl font-bold text-slate-700 dark:text-white">{{ modalVelocidad }}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">km/h</div>
                   </div>
                   <div class="text-center">
-                    <div class="text-xl font-bold text-slate-700">{{ modalEta }}</div>
-                    <div class="text-xs text-slate-500">min ETA</div>
+                    <div class="text-xl font-bold text-slate-700 dark:text-white">{{ modalEta }}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">min ETA</div>
                   </div>
                 </div>
               </div>
@@ -640,19 +640,27 @@ onUnmounted(() => {
 
 <style scoped>
 .card {
-  @apply bg-white rounded-xl border border-slate-200;
+  @apply bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700;
 }
 
 .form-input {
-  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500;
 }
 
 .btn-primary {
   @apply flex items-center justify-center gap-2 py-3 px-5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors;
 }
 
+.dark .btn-primary {
+  @apply bg-teal-600 hover:bg-teal-700;
+}
+
 .btn-secondary {
   @apply flex items-center justify-center gap-2 py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors;
+}
+
+.dark .btn-secondary {
+  @apply bg-slate-700 hover:bg-slate-600 text-slate-200;
 }
 
 .alert {
@@ -660,11 +668,11 @@ onUnmounted(() => {
 }
 
 .alert-success {
-  @apply bg-green-50 text-green-700;
+  @apply bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400;
 }
 
 .alert-error {
-  @apply bg-red-50 text-red-700;
+  @apply bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400;
 }
 </style>
 
