@@ -9,16 +9,17 @@ const routes = [
       { path: '', name: 'inicio-publico', component: () => import('../views/public/HomePublicaView.vue') },
       { path: 'boleteria', name: 'boleteria', component: () => import('../views/public/BoleteriaPublicaView.vue') },
       { path: 'registro', name: 'registro-publico', component: () => import('../views/public/RegistroPublicoView.vue') },
-      { path: 'rastrear', name: 'rastrear-bus', component: () => import('../views/public/RastrearBusView.vue') },
-      { path: 'consulta', name: 'consulta-autoridad', component: () => import('../views/autoridad/ConsultaViajeView.vue') }
+      { path: 'rastrear', name: 'rastrear-bus', component: () => import('../views/public/RastrearBusView.vue') }
     ]
   },
 
   { path: '/login', name: 'login', component: () => import('../views/auth/LoginView.vue') },
 
+  { path: '/consulta', name: 'consulta-autoridad', component: () => import('../views/autoridad/ConsultaViajeView.vue') },
+
   {
     path: '/',
-    component: () => import('../layouts/ArtDesignLayout.vue'),
+    component: () => import('../layouts/VbenAdminLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       { path: 'dashboard', name: 'dashboard', component: () => import('../views/admin/DashboardView.vue'), meta: { roles: ['administrador', 'supervisor'] } },
@@ -36,7 +37,6 @@ const routes = [
       { path: 'abordaje/validar', name: 'validar-qr', component: () => import('../views/abordaje/ValidarQrView.vue'), meta: { roles: ['auxiliar', 'supervisor', 'administrador'] } },
 
       { path: 'gps/monitoreo', name: 'gps-monitoreo', component: () => import('../views/gps/MonitoreoMapaView.vue'), meta: { roles: ['supervisor', 'administrador'] } },
-      { path: 'perfil', name: 'perfil', component: () => import('../views/admin/DashboardView.vue'), meta: { roles: ['administrador', 'supervisor', 'vendedor', 'auxiliar'] } },
     ]
   }
 ];

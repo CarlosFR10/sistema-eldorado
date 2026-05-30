@@ -7,7 +7,6 @@ import router from './router';
 import 'primeicons/primeicons.css';
 import 'leaflet/dist/leaflet.css';
 import './assets/tailwind.css';
-import './assets/styles/art-design.css';
 
 const app = createApp(App);
 app.use(createPinia());

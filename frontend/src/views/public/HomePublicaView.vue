@@ -154,7 +154,6 @@
           <RouterLink to="/boleteria" class="hover:text-white/70 transition-colors">Boleteria</RouterLink>
           <RouterLink to="/registro" class="hover:text-white/70 transition-colors">Registro</RouterLink>
           <RouterLink to="/rastrear" class="hover:text-white/70 transition-colors">Rastreo</RouterLink>
-          <RouterLink to="/consulta" class="hover:text-white/70 transition-colors">Autoridad</RouterLink>
           <RouterLink to="/login" class="hover:text-white/70 transition-colors">Panel</RouterLink>
         </div>
       </div>

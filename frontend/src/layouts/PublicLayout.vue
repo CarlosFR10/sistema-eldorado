@@ -11,6 +11,7 @@
           <RouterLink to="/boleteria" class="nav-link">Boleteria</RouterLink>
           <RouterLink to="/rastrear" class="nav-link">Rastrear</RouterLink>
           <RouterLink to="/registro" class="nav-link">Registro</RouterLink>
+          <RouterLink to="/consulta" class="nav-link">Autoridad</RouterLink>
           <RouterLink to="/login" class="btn-login">
             <User :size="18" />
             Ingresar
@@ -27,6 +28,7 @@
       <RouterLink to="/boleteria" class="mobile-link" @click="mobileMenuOpen = false">Boleteria</RouterLink>
       <RouterLink to="/rastrear" class="mobile-link" @click="mobileMenuOpen = false">Rastrear</RouterLink>
       <RouterLink to="/registro" class="mobile-link" @click="mobileMenuOpen = false">Registro</RouterLink>
+      <RouterLink to="/consulta" class="mobile-link" @click="mobileMenuOpen = false">Autoridad</RouterLink>
       <RouterLink to="/login" class="mobile-link" @click="mobileMenuOpen = false">Ingresar</RouterLink>
     </div>
 
@@ -41,6 +43,12 @@
         <div class="footer-brand">
           <Bus :size="24" />
           <span>Terminal de Buses El Dorado</span>
+        </div>
+        <div class="flex justify-center gap-6 text-sm mb-4">
+          <RouterLink to="/boleteria" class="hover:text-white/70">Boleteria</RouterLink>
+          <RouterLink to="/rastrear" class="hover:text-white/70">Rastreo</RouterLink>
+          <RouterLink to="/consulta" class="hover:text-white/70">Autoridad</RouterLink>
+          <RouterLink to="/login" class="hover:text-white/70">Panel</RouterLink>
         </div>
         <p class="footer-copy">&copy; 2026 Todos los derechos reservados</p>
       </div>
