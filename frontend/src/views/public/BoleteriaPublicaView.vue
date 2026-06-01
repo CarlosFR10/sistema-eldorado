@@ -382,3 +382,20 @@ const asientosKinds = computed(() => { const kinds = {}; pasajeros.value.forEach
 const asientosNombres = computed(() => pasajeros.value.map((p) => p.asiento?.numero).filter(Boolean).join(', ') || '-');
 const total = computed(() => { if (!viajeSeleccionado.value) return 0; return pasajeros.value.filter((p) => p.asiento?.id).length * Number(viajeSeleccionado.value.precio_final || 0); });
 </script>
+
+<style scoped>
+select.bg-white\/10 {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+select.bg-white\/10 option {
+  background-color: #1e293b;
+  color: white;
+  padding: 8px;
+}
+</style>
