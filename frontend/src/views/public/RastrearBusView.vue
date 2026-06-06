@@ -225,7 +225,8 @@ async function rastrear() {
 
   loading.value = true;
   try {
-    rastreo.value = (await publicRastrear(codigo.value)).data;
+    const res = await publicRastrear(codigo.value);
+    rastreo.value = res?.data ?? res;
     iniciarAutoRefresh();
   } catch (err) {
     error.value = err.message || 'No se encontro rastreo para ese codigo.';
@@ -249,7 +250,7 @@ async function recargarRastreo() {
   refreshing.value = true;
   try {
     const res = await publicRastrear(codigo.value);
-    rastreo.value = res.data;
+    rastreo.value = res?.data ?? res;
     const estado = rastreo.value?.estado_operativo || '';
     if ((estado === 'Viaje finalizado' || estado === 'Viaje cancelado') && refreshInterval) {
       clearInterval(refreshInterval);

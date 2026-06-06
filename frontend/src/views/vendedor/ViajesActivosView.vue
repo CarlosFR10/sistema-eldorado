@@ -98,8 +98,19 @@
         <div class="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700">
           <div>
             <p class="text-xs font-bold uppercase text-blue-600">{{ viajeSeleccionado?.codigo_viaje }}</p>
-            <h2 class="text-xl font-bold text-slate-800 dark:text-white">{{ viajeSeleccionado?.ruta?.origen }} → {{ viajeSeleccionado?.ruta?.destino }}</h2>
-            <p class="text-sm text-slate-500 dark:text-slate-400">{{ viajeSeleccionado?.bus?.placa }} | {{ viajeSeleccionado?.estado }}</p>
+            <h2 class="text-xl font-bold text-slate-800 dark:text-white">
+              {{ viajeSeleccionado?.ruta?.origen }} → {{ viajeSeleccionado?.ruta?.destino }}
+              <span v-if="viajeSeleccionado?.estado === 'completado'" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                <CheckCircle :size="14" class="mr-1" />100% Completado
+              </span>
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              {{ viajeSeleccionado?.bus?.placa }}
+              <span v-if="viajeSeleccionado?.estado === 'completado'" class="font-medium">
+                | Viaje finalizado - Origen: {{ modalWaypoints[0]?.nombre || viajeSeleccionado?.ruta?.origen }} → Destino: {{ modalWaypoints[modalWaypoints.length - 1]?.nombre || viajeSeleccionado?.ruta?.destino }}
+              </span>
+              <span v-else> | {{ viajeSeleccionado?.estado }}</span>
+            </p>
           </div>
           <button class="btn-secondary p-2" @click="cerrarModal">
             <X :size="18" />
@@ -140,10 +151,10 @@
               <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
 
               <LMarker
-                v-for="(wp, i) in modalWaypoints"
-                :key="'wp-' + i"
+                v-for="(wp, i) in visibleModalEndpoints"
+                :key="'wp-' + wp._originalIndex"
                 :lat-lng="[wp.lat, wp.lng]"
-                :icon="getModalWaypointIcon(i)"
+                :icon="getModalWaypointIcon(wp._originalIndex)"
               />
 
               <LPolyline
@@ -235,14 +246,14 @@
 </template>
 
 <script setup>
-import { CheckCircle2, Maximize2, Navigation, Plus, RefreshCcw, Trash2, X } from 'lucide-vue-next';
+import { CheckCircle, CheckCircle2, Maximize2, Navigation, Plus, RefreshCcw, Trash2, X } from 'lucide-vue-next';
 import { LMap, LMarker, LPolyline, LTileLayer } from '@vue-leaflet/vue-leaflet';
 import L from 'leaflet';
 import { onMounted, onUnmounted, reactive, ref, computed } from 'vue';
 import EstadoSemaforo from '../../components/EstadoSemaforo.vue';
 import { cambiarEstadoViaje } from '../../api/viajes';
 import { useViajeStore } from '../../stores/viaje';
-import { estadoSimulacionGps, iniciarViajeGps } from '../../api/gps';
+import { estadoSimulacionGps, iniciarViajeGps, avanzarSimulacionGps } from '../../api/gps';
 
 const viajeStore = useViajeStore();
 const filters = reactive({ fecha: new Date().toISOString().slice(0, 10), estado: 'en_venta' });
@@ -267,6 +278,14 @@ const modalSignalLoss = ref(false);
 const modalCenter = ref([-17.3895, -66.1568]);
 const modalZoom = ref(7);
 let modalRefreshInterval = null;
+
+const visibleModalEndpoints = computed(() => {
+  if (modalWaypoints.value.length <= 2) return modalWaypoints.value.map((w, i) => ({ ...w, _originalIndex: i }));
+  return [
+    { ...modalWaypoints.value[0], _originalIndex: 0 },
+    { ...modalWaypoints.value[modalWaypoints.value.length - 1], _originalIndex: modalWaypoints.value.length - 1 }
+  ];
+});
 
 const RUTAS_WAYPOINTS = {
   'CBB-LPZ': [
@@ -442,19 +461,22 @@ async function iniciarViaje(viaje) {
   message.value = '';
   procesandoId.value = viaje.id;
   try {
-    const data = await iniciarViajeGps(viaje.id);
-    if (data.success === false) {
-      throw new Error(data.message || 'Error al iniciar viaje');
+    const res = await iniciarViajeGps(viaje.id);
+    const data = res?.data ?? res;
+
+    if (!res || res.success === false) {
+      throw new Error(data?.message || data?.mensaje || 'Error al iniciar viaje');
     }
-    message.value = data.mensaje || 'Simulacion iniciada!';
+    message.value = data?.mensaje || data?.message || 'Simulacion iniciada!';
 
     viaje.estado = 'en_ruta';
-    if (data.waypoints) {
-      waypointsPorViaje.value[viaje.id] = data.waypoints;
-      routePointsPorViaje.value[viaje.id] = data.waypoints.map(w => [w.lat, w.lng]);
-      if (data.waypoints.length >= 2) {
-        const first = data.waypoints[0];
-        const last = data.waypoints[data.waypoints.length - 1];
+    const wps = data?.waypoints || data?.data?.waypoints;
+    if (wps?.length) {
+      waypointsPorViaje.value[viaje.id] = wps;
+      routePointsPorViaje.value[viaje.id] = wps.map(w => [w.lat, w.lng]);
+      if (wps.length >= 2) {
+        const first = wps[0];
+        const last = wps[wps.length - 1];
         mapCenters.value[viaje.id] = [(first.lat + last.lat) / 2, (first.lng + last.lng) / 2];
       }
     }
@@ -519,6 +541,11 @@ async function abrirModalMapa(viaje) {
     modalSignalLoss.value = false;
     await cargarDatosModal(viaje.id);
     iniciarModalRefresh();
+  } else if (viaje.estado === 'completado') {
+    await cargarDatosModal(viaje.id);
+    modalVelocidad.value = 0;
+    modalEta.value = 0;
+    modalSignalLoss.value = false;
   } else {
     modalBusPosition.value = { lat: wps[0].lat, lng: wps[0].lng };
     modalProgreso.value = 0;
@@ -532,38 +559,36 @@ async function cargarDatosModal(viajeId) {
   try {
     const res = await estadoSimulacionGps(viajeId);
     const data = res?.data ?? res;
-
-    if (!res || res.success === false) {
+    if (!data || data.success === false) {
       return;
     }
 
-    if (data.waypoints?.length) {
-      modalWaypoints.value = data.waypoints;
-      modalRoutePoints.value = data.waypoints.map(w => [w.lat, w.lng]);
-      if (data.waypoints.length >= 2) {
-        const first = data.waypoints[0];
-        const last = data.waypoints[data.waypoints.length - 1];
+    const d = data?.data ?? data;
+
+    if (d.waypoints?.length) {
+      modalWaypoints.value = d.waypoints;
+      modalRoutePoints.value = d.waypoints.map(w => [w.lat, w.lng]);
+      if (d.waypoints.length >= 2) {
+        const first = d.waypoints[0];
+        const last = d.waypoints[d.waypoints.length - 1];
         modalCenter.value = [(first.lat + last.lat) / 2, (first.lng + last.lng) / 2];
       }
     }
 
-    if (data.latitud !== undefined && data.latitud !== null) {
-      modalBusPosition.value = { lat: data.latitud, lng: data.longitud };
+    if (d.latitud !== undefined && d.latitud !== null) {
+      modalBusPosition.value = { lat: d.latitud, lng: d.longitud };
     }
 
-    if (data.progreso !== undefined && data.progreso !== null) {
-      modalProgreso.value = data.progreso;
-    } else if (data.llamada_actual !== undefined && data.llamadas_totales !== undefined) {
-      modalProgreso.value = (data.llamada_actual / data.llamadas_totales) * 100;
+    const rawProgreso = d.progreso ?? (d.llamada_actual !== undefined && d.llamadas_totales !== undefined ? (d.llamada_actual / d.llamadas_totales) * 100 : 0);
+    modalProgreso.value = typeof rawProgreso === 'number' && !isNaN(rawProgreso) ? rawProgreso : 0;
+    if (d.velocidad !== undefined && d.velocidad !== null) {
+      modalVelocidad.value = d.velocidad;
     }
-    if (data.velocidad !== undefined && data.velocidad !== null) {
-      modalVelocidad.value = data.velocidad;
+    if (d.eta_minutos !== undefined && d.eta_minutos !== null) {
+      modalEta.value = d.eta_minutos;
     }
-    if (data.eta_minutos !== undefined && data.eta_minutos !== null) {
-      modalEta.value = data.eta_minutos;
-    }
-    if (data.signal_loss !== undefined && data.signal_loss !== null) {
-      modalSignalLoss.value = data.signal_loss;
+    if (d.signal_loss !== undefined && d.signal_loss !== null) {
+      modalSignalLoss.value = d.signal_loss;
     }
   } catch (e) {
     console.warn('Error cargando datos modal:', e?.message || e);
@@ -573,37 +598,39 @@ async function cargarDatosModal(viajeId) {
 async function pollAvanzar() {
   if (!viajeSeleccionado.value?.id) return;
   try {
-    const res = await estadoSimulacionGps(viajeSeleccionado.value.id);
+    const res = await avanzarSimulacionGps(viajeSeleccionado.value.id);
     const data = res?.data ?? res;
 
-    if (!res || res.success === false) {
+    if (!data || data.success === false) {
       return;
     }
 
-    if (data.waypoints?.length) {
-      modalWaypoints.value = data.waypoints;
-      modalRoutePoints.value = data.waypoints.map(w => [w.lat, w.lng]);
+    const simData = data?.data ?? data;
+
+    if (simData.waypoints?.length) {
+      modalWaypoints.value = simData.waypoints;
+      modalRoutePoints.value = simData.waypoints.map(w => [w.lat, w.lng]);
     }
 
-    if (data.latitud !== undefined && data.latitud !== null) {
-      modalBusPosition.value = { lat: data.latitud, lng: data.longitud };
+    if (simData.latitud !== undefined && simData.latitud !== null) {
+      modalBusPosition.value = { lat: simData.latitud, lng: simData.longitud };
     }
 
-    const rawProgreso = data.progreso ?? (data.llamada_actual && data.llamadas_totales ? (data.llamada_actual / data.llamadas_totales) * 100 : 0);
+    const rawProgreso = simData.progreso ?? (simData.llamada_actual && simData.llamadas_totales ? (simData.llamada_actual / simData.llamadas_totales) * 100 : 0);
     const progresoNum = parseFloat(rawProgreso);
     modalProgreso.value = isNaN(progresoNum) ? 0 : progresoNum;
 
-    if (data.velocidad !== undefined && data.velocidad !== null) {
-      modalVelocidad.value = Number(data.velocidad) || 0;
+    if (simData.velocidad !== undefined && simData.velocidad !== null) {
+      modalVelocidad.value = Number(simData.velocidad) || 0;
     }
-    if (data.eta_minutos !== undefined && data.eta_minutos !== null) {
-      modalEta.value = Number(data.eta_minutos) || 0;
+    if (simData.eta_minutos !== undefined && simData.eta_minutos !== null) {
+      modalEta.value = Number(simData.eta_minutos) || 0;
     }
-    if (data.signal_loss !== undefined && data.signal_loss !== null) {
-      modalSignalLoss.value = Boolean(data.signal_loss);
+    if (simData.signal_loss !== undefined && simData.signal_loss !== null) {
+      modalSignalLoss.value = Boolean(simData.signal_loss);
     }
 
-    if (data.fin) {
+    if (simData.fin) {
       viajeSeleccionado.value.estado = 'completado';
       modalProgreso.value = 100;
       detenerModalRefresh();

@@ -58,6 +58,24 @@
                   {{ item.pasajero.tiene_huella ? 'Huella verificada' : 'Huella no verificada' }}
                 </p>
               </div>
+              <div v-if="item.pasajero && esMenor(item.pasajero)" class="mt-3 p-3 rounded-lg border border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20">
+                <p class="flex items-center gap-2 font-semibold text-yellow-800 dark:text-yellow-300 text-sm">
+                  <Link2 :size="14" />
+                  Menor de edad: enlazar adulto responsable
+                </p>
+                <select v-model="item.adulto_resp_id" class="w-full mt-2 px-3 py-2 rounded-lg border border-yellow-300 dark:border-yellow-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-sm">
+                  <option value="">Seleccionar adulto responsable</option>
+                  <option v-for="adulto in adultosDisponibles(index)" :key="adulto.id" :value="adulto.id">
+                    {{ nombreCompleto(adulto) }}
+                  </option>
+                </select>
+                <p v-if="adultoNombre(item)" class="mt-2 text-xs font-semibold text-yellow-800 dark:text-yellow-300">
+                  {{ adultoNombre(item) }} viajara con {{ nombreCompleto(item.pasajero) }}.
+                </p>
+                <p v-else class="mt-2 text-xs text-yellow-700 dark:text-yellow-400">
+                  Agrega al adulto como otro pasajero para habilitar este pasaje.
+                </p>
+              </div>
               <p v-if="item.error" class="mt-2 text-sm text-red-600 dark:text-red-400">{{ item.error }}</p>
             </div>
           </div>
@@ -133,7 +151,7 @@
 </template>
 
 <script setup>
-import { Fingerprint, Search, Ticket } from 'lucide-vue-next';
+import { Fingerprint, Link2, Search, Ticket } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { emitirBoleto } from '../../api/boletos';
@@ -221,7 +239,7 @@ function seleccionarAsiento(asiento) {
 
 async function emitir(pagoYaValidado = false) {
   const pagoValidado = pagoYaValidado === true;
-  error.value = ''; message.value = ''; boletos.value = '';
+  error.value = ''; message.value = ''; boletos.value = [];
   if (!selectedViajeId.value) { error.value = 'Selecciona un viaje.'; return; }
   if (pasajerosListos.value !== cantidadPasajeros.value) { error.value = 'Completa todos los pasajeros, sus asientos y adulto responsable si hay menor.'; return; }
   if (metodoPago.value !== 'efectivo' && !pagoValidado) { mostrarPago.value = true; return; }

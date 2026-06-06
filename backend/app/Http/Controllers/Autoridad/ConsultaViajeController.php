@@ -213,13 +213,25 @@ class ConsultaViajeController extends Controller
         ];
 
         $rutaCode = $viaje?->ruta?->codigo;
-        $waypoints = self::RUTAS_WAYPOINTS[$rutaCode] ?? self::RUTAS_WAYPOINTS['CBB-LPZ'];
+
+        // Usar waypoints de la simulacion si existen, sino los hardcodeados
+        if ($viaje && $viaje->estado === 'en_ruta' && !empty($viaje->simulacion_waypoints)) {
+            $waypoints = $viaje->simulacion_waypoints;
+        } else {
+            $waypoints = self::RUTAS_WAYPOINTS[$rutaCode] ?? self::RUTAS_WAYPOINTS['CBB-LPZ'];
+        }
 
         // Calcular progreso basado en simulacion
         $progreso = 0;
         $velocidadAnterior = null;
+        $signalLossActive = false;
+        $etaMinutos = null;
+
         if ($viaje && $viaje->estado === 'en_ruta' && $viaje->simulacion_llamadas_totales > 0) {
-            $progreso = ($viaje->simulacion_llamada_actual / $viaje->simulacion_llamadas_totales) * 100;
+            $llamada = (int) $viaje->simulacion_llamada_actual;
+            $total = (int) $viaje->simulacion_llamadas_totales;
+            $progreso = ($llamada / $total) * 100;
+
             // Buscar velocidad anterior al signal loss
             $ultimaConVelocidad = UbicacionGps::where('viaje_id', $viaje->id)
                 ->where('signal_loss', false)
@@ -227,19 +239,46 @@ class ConsultaViajeController extends Controller
                 ->latest('timestamp')
                 ->first();
             $velocidadAnterior = $ultimaConVelocidad?->velocidad;
+
+            // Obtener ultima ubicacion para signal loss
+            $ultimaGps = UbicacionGps::where('viaje_id', $viaje->id)
+                ->latest('timestamp')
+                ->first();
+            $signalLossActive = $ultimaGps && $ultimaGps->signal_loss;
+
+            // Calcular ETA
+            $llamadasRestantes = $total - $llamada;
+            $etaMinutos = max(1, (int) ceil($llamadasRestantes * 2 / 60));
+            if ($signalLossActive) {
+                $etaMinutos = (int) ceil($etaMinutos * 1.5);
+            }
         }
 
-        // Obtener ultima ubicacion con datos correctos
-        $ultimaGps = UbicacionGps::where('viaje_id', $viaje->id)
-            ->latest('timestamp')
-            ->first();
-        $signalLossActive = $ultimaGps && $ultimaGps->signal_loss;
+        // Ajustar velocidad si hay seal perdida
         if ($signalLossActive && $velocidadAnterior) {
             $ubicacion['velocidad'] = (float) $velocidadAnterior;
             $ubicacion['velocidad_estimada'] = true;
+            $ubicacion['signal_loss'] = true;
+        } elseif ($ultima) {
+            $ubicacion['velocidad'] = (float) $ultima->velocidad;
+            $ubicacion['signal_loss'] = $signalLossActive;
+        } else {
+            $ubicacion['signal_loss'] = $signalLossActive;
         }
-        if (!$signalLossActive) {
-            $signalLossActive = false;
+
+        // Obtener waypoints actuales para el mapa
+        $totalWp = count($waypoints);
+        $waypointIdx = 0;
+        $waypointActualNombre = $waypoints[0]['nombre'] ?? '';
+        $waypointSiguienteNombre = $waypoints[1]['nombre'] ?? '';
+
+        if ($viaje && $viaje->estado === 'en_ruta' && $viaje->simulacion_llamadas_totales > 0) {
+            $llamada = (int) $viaje->simulacion_llamada_actual;
+            $total = (int) $viaje->simulacion_llamadas_totales;
+            $progresoTmp = $llamada / $total;
+            $waypointIdx = min((int) floor($progresoTmp * ($totalWp - 1)), $totalWp - 2);
+            $waypointActualNombre = $waypoints[$waypointIdx]['nombre'] ?? '';
+            $waypointSiguienteNombre = $waypoints[$waypointIdx + 1]['nombre'] ?? '';
         }
 
         return $this->success([
@@ -247,7 +286,7 @@ class ConsultaViajeController extends Controller
             'codigo' => $codigo,
             'estado_operativo' => $this->estadoOperativo($viaje),
             'mensaje_estado' => $this->mensajeEstado($viaje),
-            'eta_minutos' => $this->etaMinutos($viaje, (bool) $signalLossActive, $velocidadAnterior !== null ? (float) $velocidadAnterior : null),
+            'eta_minutos' => $etaMinutos,
             'progreso' => round($progreso, 1),
             'boleto' => $boleto,
             'viaje' => $viaje?->loadMissing(['ruta', 'bus']),
@@ -257,7 +296,10 @@ class ConsultaViajeController extends Controller
             'ubicacion' => $ubicacion,
             'historial' => $historial,
             'waypoints' => $waypoints,
+            'waypoint_actual' => $waypointActualNombre,
+            'waypoint_siguiente' => $waypointSiguienteNombre,
             'velocidad_estimada' => $velocidadAnterior,
+            'signal_loss' => $signalLossActive,
         ], 'Rastreo del bus.');
     }
 

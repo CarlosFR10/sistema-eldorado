@@ -10,7 +10,8 @@ const routes = [
       { path: 'boleteria', name: 'boleteria', component: () => import('../views/public/BoleteriaPublicaView.vue') },
       { path: 'registro', name: 'registro-publico', component: () => import('../views/public/RegistroPublicoView.vue') },
       { path: 'rastrear', name: 'rastrear-bus', component: () => import('../views/public/RastrearBusView.vue') },
-      { path: 'consulta', name: 'consulta-autoridad', component: () => import('../views/autoridad/ConsultaViajeView.vue') }
+      { path: 'consulta', name: 'consulta-autoridad', component: () => import('../views/autoridad/ConsultaViajeView.vue') },
+      { path: 'consulta/boleto', name: 'consulta-boleto', component: () => import('../views/autoridad/ConsultaBoletoView.vue') }
     ]
   },
 

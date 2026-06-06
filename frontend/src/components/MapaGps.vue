@@ -4,10 +4,10 @@
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="OpenStreetMap" />
 
       <LMarker
-        v-for="(wp, i) in waypoints"
-        :key="'wp-' + i"
+        v-for="(wp, i) in visibleEndpoints"
+        :key="'wp-' + wp._originalIndex"
         :lat-lng="[wp.lat, wp.lng]"
-        :icon="getWaypointIcon(i)"
+        :icon="getWaypointIcon(wp._originalIndex)"
       />
 
       <LMarker
@@ -62,6 +62,14 @@ const center = computed(() => {
 const routePoints = computed(() =>
   props.waypoints.map((w) => [w.lat, w.lng])
 );
+
+const visibleEndpoints = computed(() => {
+  if (props.waypoints.length <= 2) return props.waypoints.map((w, i) => ({ ...w, _originalIndex: i }));
+  return [
+    { ...props.waypoints[0], _originalIndex: 0 },
+    { ...props.waypoints[props.waypoints.length - 1], _originalIndex: props.waypoints.length - 1 }
+  ];
+});
 
 const busIcon = computed(() => {
   const color = props.signalLoss ? '#94A3B8' : '#0F766E';

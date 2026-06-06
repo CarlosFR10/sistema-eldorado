@@ -60,7 +60,7 @@ class ViajeController extends Controller
             $fechaSalida = \Carbon\Carbon::parse($data['fecha_salida']);
             $fechaLlegada = \Carbon\Carbon::parse($data['fecha_llegada_est']);
 
-            $conflicto = Viaje::where('bus_id', $bus->id)
+            $conflictoBus = Viaje::where('bus_id', $bus->id)
                 ->whereIn('estado', ['en_venta', 'abordando', 'en_ruta', 'programado'])
                 ->where(function ($query) use ($fechaSalida) {
                     $query->where('fecha_salida', '>=', $fechaSalida->copy()->subMinutes(150))
@@ -68,8 +68,19 @@ class ViajeController extends Controller
                 })
                 ->exists();
 
-            if ($conflicto) {
+            if ($conflictoBus) {
                 throw new \RuntimeException("El bus {$bus->placa} necesita 2:30 horas minimas desde su ultimo viaje. Escolja otro bus o cambie la hora.");
+            }
+
+            $horaExacta = $fechaSalida->format('H:i');
+            $conflictoHorario = Viaje::whereDate('fecha_salida', $fechaSalida->toDateString())
+                ->where('ruta_id', $ruta->id)
+                ->whereIn('estado', ['en_venta', 'abordando', 'en_ruta', 'programado'])
+                ->whereRaw("DATE_FORMAT(fecha_salida, '%H:%i') = ?", [$horaExacta])
+                ->exists();
+
+            if ($conflictoHorario) {
+                throw new \RuntimeException("Ya existe un viaje para la ruta {$ruta->codigo} a las {$horaExacta} en esta fecha. Escolja otro horario.");
             }
 
             $viaje = Viaje::create([

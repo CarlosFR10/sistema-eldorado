@@ -211,10 +211,10 @@ async function pollAvanzar() {
   isLoading.value = true;
   try {
     const res = await avanzarSimulacionGps(viajeId.value);
-    estadoSim.value = res.data;
+    estadoSim.value = res;
 
-    if (!res.data.fin) {
-      busPosition.value = { lat: res.data.latitud, lng: res.data.longitud };
+    if (!res.fin) {
+      busPosition.value = { lat: res.latitud, lng: res.longitud };
     } else {
       detenerPoll();
     }
@@ -231,21 +231,21 @@ async function cargarViaje() {
   errorMsg.value = '';
   try {
     const res = await estadoSimulacionGps(viajeId.value);
-    estadoSim.value = res.data;
+    estadoSim.value = res;
 
-    if (res.data?.waypoints?.length) {
-      waypoints.value = res.data.waypoints;
+    if (res?.waypoints?.length) {
+      waypoints.value = res.waypoints;
     } else {
       waypoints.value = RUTAS_WAYPOINTS['CBB-LPZ'];
     }
 
-    if (res.data?.latitud && res.data?.longitud) {
-      busPosition.value = { lat: res.data.latitud, lng: res.data.longitud };
-    } else if (res.data?.waypoints?.length) {
-      busPosition.value = { lat: res.data.waypoints[0].lat, lng: res.data.waypoints[0].lng };
+    if (res?.latitud && res?.longitud) {
+      busPosition.value = { lat: res.latitud, lng: res.longitud };
+    } else if (res?.waypoints?.length) {
+      busPosition.value = { lat: res.waypoints[0].lat, lng: res.waypoints[0].lng };
     }
 
-    if (!res.data?.fin && res.data?.estado === 'en_ruta') {
+    if (!res?.fin && res?.estado === 'en_ruta') {
       iniciarPoll();
     }
   } catch (e) {
